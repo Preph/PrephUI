@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrephUI - Modern WoW Interface</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-orange: #ff7b00;
+            --brand-orange-hover: #e66e00;
+            --bg-dark: #0d0d0d;
+            --bg-surface: #1a1a1a;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Background Effects */
+        .ambient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .glowing-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out alternate;
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 123, 0, 0.08) 0%, rgba(0,0,0,0) 60%);
+            top: -10%;
+            left: -10%;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 123, 0, 0.06) 0%, rgba(0,0,0,0) 60%);
+            bottom: 5%;
+            right: -5%;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 123, 0, 0.04) 0%, rgba(0,0,0,0) 60%);
+            top: 30%;
+            left: 40%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 80px) scale(1.1); }
+            100% { transform: translate(-30px, 40px) scale(0.9); }
+        }
+
+        /* Custom Orange Accents */
+        .text-orange { color: var(--brand-orange) !important; }
+        .bg-orange { background-color: var(--brand-orange) !important; }
+        
+        .btn-orange {
+            background-color: var(--brand-orange);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-orange:hover {
+            background-color: var(--brand-orange-hover);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+        }
+
+        .btn-outline-orange {
+            border: 2px solid var(--brand-orange);
+            color: var(--brand-orange);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-orange:hover {
+            background-color: var(--brand-orange);
+            color: #fff;
+        }
+
+        /* Nav */
+        .navbar {
+            background-color: rgba(13, 13, 13, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, rgba(26,26,26,0.6) 0%, rgba(13,13,13,1) 100%);
+            padding: 140px 0 60px;
+            position: relative;
+        }
+
+        .hero-showcase {
+            margin-top: -40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Images & Media */
+        .showcase-img {
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        border-color 0.4s ease, 
+                        box-shadow 0.4s ease, 
+                        z-index 0s;
+        }
+
+        .showcase-img:hover {
+            transform: scale(1.25);
+            z-index: 1000;
+            border-color: var(--brand-orange);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 123, 0, 0.4);
+        }
+
+        .row, .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Layout Utilities */
+        .bg-surface { background-color: rgba(26, 26, 26, 0.6); backdrop-filter: blur(5px); }
+        .border-orange { border-color: var(--brand-orange) !important; }
+        
+        /* Cards */
+        .feature-card {
+            background-color: rgba(13, 13, 13, 0.8);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            height: 100%;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .feature-card:hover { 
+            border-color: var(--brand-orange); 
+            transform: translateY(-5px);
+        }
+        .feature-icon { font-size: 2rem; color: var(--brand-orange); margin-bottom: 15px; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background Animation with Particles -->
+    <div class="ambient-background">
+        <canvas id="particleCanvas"></canvas>
+        <div class="glowing-orb orb-1"></div>
+        <div class="glowing-orb orb-2"></div>
+        <div class="glowing-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-shield-halved text-orange me-2"></i>PrephUI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#philosophy">Philosophy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-orange btn-sm mt-1" href="https://github.com/" target="_blank">
+                            <i class="fa-brands fa-github me-1"></i> View Source
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center border-bottom border-orange">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">Enhance Without <span class="text-orange">Bloat</span></h1>
+            <p class="lead mb-5 mx-auto" style="max-width: 800px; color: var(--text-muted);">
+                Modern WoW has a lot built-in and just needs some nudges. PrephUI utilizes built-in secure templates to gather the most performance while adding the utmost needed quality of life and visual fidelity.
+            </p>
+            <div class="d-flex justify-content-center gap-3 mb-5">
+                <a href="#features" class="btn btn-orange px-4 py-2">Explore Features</a>
+                <a href="https://github.com/" class="btn btn-outline-orange px-4 py-2">Download Latest</a>
+            </div>
+            
+            <div class="hero-showcase px-3">
+                <img src="./.github/gitmedia/overview.png" alt="PrephUI Full Overview" class="img-fluid showcase-img w-100" style="max-width: 1000px;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy & Edit Mode -->
+    <section id="philosophy" class="py-5 bg-surface mt-5">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-3">Our <span class="text-orange">Philosophy</span></h2>
+                    <p class="fs-5" style="color: var(--text-muted);">
+                        Inspired by the comprehensive QoL of ElvUI and the modern, performant approach of EllesmereUI, PrephUI takes the next logical step. 
+                    </p>
+                    <p style="color: var(--text-muted);">
+                        Instead of completely reconstructing the UI from scratch and dragging along tens of heavy libraries, we aim to be as slim as possible. By leveraging native Blizzard code and secure templates, we deliver a clean, fast, and highly functional interface that feels like an evolution of the default game rather than a total replacement.
+                    </p>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-2"><i class="fa-solid fa-check text-orange me-2"></i> Minimal external library dependencies.</li>
+                        <li class="mb-2"><i class="fa-solid fa-bolt text-orange me-2"></i> Built on top of native secure templates.</li>
+                        <li><i class="fa-solid fa-sliders text-orange me-2"></i> Seamless Edit Mode integration.</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 position-relative">
+                    <img src="./.github/gitmedia/editmode.png" alt="Edit Mode" class="img-fluid showcase-img w-100">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Visual Features -->
+    <section id="features" class="py-5">
+        <div class="container py-5">
+            <div class="text-center mb-5 pb-3">
+                <h2 class="fw-bold">Visual <span class="text-orange">Fidelity</span></h2>
+                <p class="text-muted">Precision tools for high-end encounters.</p>
+            </div>
+            
+            <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
+                <div class="col-lg-5 order-2 order-lg-1 position-relative">
+                    <img src="./.github/gitmedia/actionbars.png" alt="Actionbars" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="./.github/gitmedia/proccs.png" alt="Procc Overlays" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="./.github/gitmedia/classbar.png" alt="Classbars" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="./.github/gitmedia/nameplate.png" alt="Nameplates" class="img-fluid showcase-img w-100">
+                </div>
+                <div class="col-lg-7 order-1 order-lg-2 ps-lg-5">
+                    <h3 class="fw-bold mb-3">Combat <span class="text-orange">Clarity</span></h3>
+                    <p class="text-muted mb-4">Keep your eyes on the action with enhanced action bars, dynamic nameplates, and visual class mechanics that don't overwhelm your screen.</p>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fa-solid fa-stopwatch feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Actionbars & Debuff Timers</h5>
+                            <p class="text-muted small">Clean, crisp action bars with integrated, highly readable debuff timers overlaid directly on your abilities.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fa-solid fa-wand-magic-sparkles feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Custom Procc Overlays</h5>
+                            <p class="text-muted small">Beautiful custom textures for critical class proccs (like Mage's Hot Streak or Arcane Missiles) to ensure you never miss a beat.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fa-solid fa-layer-group feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Integrated Classbars</h5>
+                            <p class="text-muted small">Sleek, built-in classbars showcasing multiple class mechanics without requiring heavy standalone addons.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-3"><i class="fa-solid fa-id-badge feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Dynamic Nameplates</h5>
+                            <p class="text-muted small">Refined nameplates designed to instantly communicate threat, debuffs, and target health directly on the battlefield.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center g-5 mb-5 pb-4">
+                <div class="col-lg-7 pe-lg-5">
+                    <h3 class="fw-bold mb-3">Group <span class="text-orange">Awareness</span></h3>
+                    <p class="text-muted mb-4">Modernized unit frames and raid tools designed for split-second decision making in group content.</p>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fa-solid fa-users feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Raid Frames & Summons</h5>
+                            <p class="text-muted small">Highly configurable raid frames featuring explicit summon icons, role indicators, and clear deficit health tracking.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fa-solid fa-hand-sparkles feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Dedicated Dispell Frames</h5>
+                            <p class="text-muted small">Instantly identify curable debuffs with highlighted dispell frames tailored to your class capabilities.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-3"><i class="fa-solid fa-user-shield feature-icon fs-3"></i></div>
+                        <div>
+                            <h5 class="mb-1">Typical Unitframes, Perfected</h5>
+                            <p class="text-muted small">The classic layout modernized. Crisp health bars, readable text, and precise sizing for optimal awareness.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 position-relative">
+                    <img src="./.github/gitmedia/raidframe.png" alt="Raid Frames" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="./.github/gitmedia/dispells.png" alt="Dispell Frames" class="img-fluid showcase-img w-100">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional QoL Features Grid -->
+    <section class="py-5 bg-surface">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h3 class="fw-bold">Everyday <span class="text-orange">Quality of Life</span></h3>
+            </div>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="feature-card h-100 d-flex flex-column">
+                        <div class="mb-4 position-relative">
+                            <img src="./.github/gitmedia/bag.png" alt="Unified Bags" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
+                        </div>
+                        <div class="mt-auto">
+                            <h5 class="mb-2"><i class="fa-solid fa-briefcase text-orange me-2"></i>Unified Bags</h5>
+                            <p class="text-muted mb-0 small">A typical Onebag reskin featuring a streamlined interface and a built-in search bar for instant inventory management.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card h-100 d-flex flex-column">
+                        <div class="mb-4 position-relative">
+                            <img src="./.github/gitmedia/chat.png" alt="Chat Skin" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
+                        </div>
+                        <div class="mt-auto">
+                            <h5 class="mb-2"><i class="fa-solid fa-message text-orange me-2"></i>Chat Skin</h5>
+                            <p class="text-muted mb-0 small">A modernized chat interface that cleans up clutter, adjusts fonts, and makes communication seamlessly blend with the UI.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="feature-card text-center p-4">
+                        <h5 class="mb-3 text-start"><i class="fa-solid fa-chart-bar text-orange me-2"></i>Global Databars</h5>
+                        <p class="text-muted mb-4 text-start small">Track your Gold across the account, monitor Raid IDs, and get quick access to guild info, online players, and their status.</p>
+                        <div class="position-relative">
+                            <img src="./.github/gitmedia/databar.png" alt="Global Databars" class="img-fluid showcase-img w-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center" style="background-color: rgba(13,13,13,0.9); border-top: 2px solid var(--brand-orange); position: relative; z-index: 10;">
+        <div class="container">
+            <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                &copy; Prephalia 2026
+            </p>
+            <div class="mt-3">
+                <a href="#" class="text-muted me-3 text-decoration-none hover-orange"><i class="fa-brands fa-github fs-5"></i></a>
+                <a href="#" class="text-muted text-decoration-none hover-orange"><i class="fa-brands fa-discord fs-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Particle Engine Script -->
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let particlesArray = [];
+        const numberOfParticles = window.innerWidth < 768 ? 40 : 100;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                // Slow, floaty movement
+                this.speedX = (Math.random() * 0.6) - 0.3;
+                this.speedY = (Math.random() * -0.6) - 0.2; // Tendency to float upwards
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.pulse = Math.random() * 0.01;
+                this.pulseDirection = 1;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Opacity pulsing
+                if (this.opacity >= 0.6) this.pulseDirection = -1;
+                if (this.opacity <= 0.1) this.pulseDirection = 1;
+                this.opacity += this.pulse * this.pulseDirection;
+
+                // Screen wrapping
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(255, 123, 0, ${this.opacity})`;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = 'rgba(255, 123, 0, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset for performance
+            }
+        }
+        
+        function init() {
+            setCanvasSize();
+            particlesArray = [];
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+        });
+        
+        init();
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+    "project": {
+        "name": "PrephUI",
+        "author": "Julian Stiebler",
+        "github_url": "https://github.com/yourusername/PrephUI",
+        "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
+        "changelog": "PrephUI\\Modules\\General\\ChangelogSettings.lua"
+    },
+    "paths": {
+        "wow_addon_directory": "C:\\Games\\Battle.net\\World of Warcraft\\_classic_era_\\Interface\\AddOns"
+    },
+    "version": {
+        "major": 0,
+        "minor": 0,
+        "patch": 9
+    }
+}
