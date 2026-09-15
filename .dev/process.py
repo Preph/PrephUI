@@ -191,6 +191,44 @@ def enforce_lua_headers(addon_dir):
                         f.write(new_content)
                     print(f"Success: Added new header to {formatted_rel_path}")
 
+def update_readme_toc(addon_dir):
+    """Parses changelog headers from README.md and updates the TOC automatically."""
+    print("\n--- Updating README Table of Contents ---")
+    readme_path = addon_dir / "README.md"
+    
+    if not readme_path.exists():
+        print(f"Error: README.md not found at {readme_path}")
+        return
+
+    with open(readme_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    changelog_match = re.search(r"## Changelog\s*\n(.*)", content, re.DOTALL)
+    if not changelog_match:
+        print("Warning: Could not find '## Changelog' section in README.md")
+        return
+
+    versions = re.findall(r"^###\s+(V[\w\.\-]+)", changelog_match.group(1), re.MULTILINE)
+    
+    # Compute the anchor slug outside of the f-string expression block
+    toc_entries = []
+    for v in versions:
+        slug = re.sub(r'[^\w-]', '', v.lower())
+        toc_entries.append(f"  - [{v}](#{slug})")
+
+    new_toc_block = "- [Changelog](#changelog)\n" + "\n".join(toc_entries)
+
+    pattern = r"(- \[Changelog\]\(#changelog\)\n(?:\s+- \[.*?\]\(#.*?\)\n?)*)"
+    
+    if re.search(pattern, content):
+        updated_content = re.sub(pattern, new_toc_block + "\n", content, count=1)
+        if updated_content != content:
+            with open(readme_path, 'w', encoding='utf-8') as f:
+                f.write(updated_content)
+            print("Success: Updated README.md Table of Contents")
+        else:
+            print("Skipped: README.md Table of Contents is already up to date")
+            
 def package_addon(addon_dir, packaged_dir, version_string):
     """Packages the PrephUI folder into a zip file inside the .packaged directory."""
     print("\n--- Packaging Addon ---")
@@ -223,6 +261,7 @@ def main():
     generate_folder_junction(wow_addon_dir, addon_dir)
     update_toc_version(addon_dir, version_string)
     update_changelog(root_dir, addon_dir, changelog_lua_rel_path)
+    update_readme_toc(addon_dir)
     enforce_lua_headers(addon_dir)
     package_addon(addon_dir, packaged_dir, version_string)
     
