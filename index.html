@@ -341,6 +341,48 @@
             background: #080808;
         }
 
+        /* Raid frame overlay examples with labels */
+        .overlay-example {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .overlay-example:last-child {
+            margin-bottom: 0;
+        }
+
+        .overlay-example-label {
+            min-width: 150px;
+            text-align: right;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .overlay-example-image {
+            flex: 0 1 250px;
+            max-width: 250px;
+        }
+
+        @media (max-width: 575.98px) {
+            .overlay-example {
+                gap: 10px;
+            }
+
+            .overlay-example-label {
+                min-width: 105px;
+                font-size: 0.78rem;
+            }
+
+            .overlay-example-image {
+                max-width: 190px;
+            }
+        }
+
         .style-chip {
             display: inline-flex;
             align-items: center;
@@ -475,7 +517,7 @@
                     <div class="d-flex mb-3">
                         <div class="me-3"><i class="fa-solid fa-stopwatch feature-icon fs-3"></i></div>
                         <div>
-                            <h5 class="mb-1">Actionbars & Debuff Timers</h5>
+                            <h5 class="mb-1">Actionbars with Buff and Debuff Timers</h5>
                             <p class="text-muted small">Clean, crisp action bars with integrated, highly readable debuff timers overlaid directly on your abilities.</p>
                         </div>
                     </div>
@@ -497,7 +539,7 @@
                         <div class="me-3"><i class="fa-solid fa-id-badge feature-icon fs-3"></i></div>
                         <div>
                             <h5 class="mb-1">Dynamic Nameplates</h5>
-                            <p class="text-muted small">Refined, modern nameplates to instantly communicate threat, debuffs, buffs, kicks, hover, focus and alike directly on the nameplates.</p>
+                            <p class="text-muted small">Refined, modern nameplates to instantly communicate threat, debuffs, buffs, kicks, hover, focus aswell as quest obvjectives and alike directly on the nameplates.</p>
                         </div>
                     </div>
                 </div>
@@ -549,25 +591,41 @@
                         alt="Raid Frames"
                         class="img-fluid showcase-img w-100 mb-4">
 
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/dispells.png"
-                        alt="Dispell Frames"
-                        class="img-fluid showcase-img mx-auto d-block"
-                        style="max-width: 250px;">
+                    <div class="overlay-example">
+                        <div class="overlay-example-label">Dispell</div>
+                        <div class="overlay-example-image">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/dispells.png"
+                                alt="Dispell"
+                                class="img-fluid showcase-img w-100">
+                        </div>
+                    </div>
 
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/absorb.png"
-                        alt="Absorb"
-                        class="img-fluid showcase-img mx-auto d-block"
-                        style="max-width: 250px;">
+                    <div class="overlay-example">
+                        <div class="overlay-example-label">Absorb</div>
+                        <div class="overlay-example-image">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/absorb.png"
+                                alt="Absorb"
+                                class="img-fluid showcase-img w-100">
+                        </div>
+                    </div>
 
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/healabsorb.png"
-                        alt="Heal Absorb"
-                        class="img-fluid showcase-img mx-auto d-block"
-                        style="max-width: 250px;">
+                    <div class="overlay-example">
+                        <div class="overlay-example-label">Heal Absorb</div>
+                        <div class="overlay-example-image">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/healabsorb.png"
+                                alt="Heal Absorb"
+                                class="img-fluid showcase-img w-100">
+                        </div>
+                    </div>
 
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/maxhealthreduce.png"
-                        alt="Maximum Health Reduction"
-                        class="img-fluid showcase-img mx-auto d-block"
-                        style="max-width: 250px;">
+                    <div class="overlay-example">
+                        <div class="overlay-example-label">Max Health Reduction</div>
+                        <div class="overlay-example-image">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/maxhealthreduce.png"
+                                alt="Max Health Reduction"
+                                class="img-fluid showcase-img w-100">
+                        </div>
+                    </div>
                 </div>
             </div>
     </section>
