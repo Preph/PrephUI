@@ -187,6 +187,65 @@
         }
         .feature-icon { font-size: 2rem; color: var(--brand-orange); margin-bottom: 15px; }
 
+        /* Damage Meter style switcher */
+        .damage-style-switcher {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 6px;
+            border: 1px solid rgba(255, 123, 0, 0.28);
+            border-radius: 10px;
+            background: rgba(13, 13, 13, 0.72);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+        }
+
+        .damage-style-btn {
+            border: 1px solid transparent;
+            border-radius: 7px;
+            background: transparent;
+            color: #a0a0a0;
+            padding: 9px 18px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .damage-style-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 123, 0, 0.45);
+            background: rgba(255, 123, 0, 0.08);
+        }
+
+        .damage-style-btn.active {
+            color: #fff;
+            background: var(--brand-orange);
+            border-color: var(--brand-orange);
+            box-shadow: 0 4px 14px rgba(255, 123, 0, 0.24);
+        }
+
+        .damage-hero-showcase {
+            margin-top: 8px;
+        }
+
+        .damage-hero-image {
+            opacity: 1;
+            transition: opacity 0.18s ease, transform 0.3s ease;
+        }
+
+        .damage-hero-image.is-switching {
+            opacity: 0.15;
+            transform: scale(0.992);
+        }
+
+        .damage-style-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+
 
         /* Product switcher */
         .product-tabs {
@@ -634,15 +693,21 @@
                     with a familiar WoW-style presentation and a clean modern option.
                 </p>
 
-                <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
-                    <span class="style-chip"><i class="fa-solid fa-layer-group text-orange"></i>WoW Forever style</span>
-                    <span class="style-chip"><i class="fa-solid fa-wand-magic-sparkles text-orange"></i>Modern style</span>
+                <div class="damage-style-switcher mb-3" role="group" aria-label="Damage Meter visual style">
+                    <button type="button" class="damage-style-btn" data-damage-style="forever" aria-pressed="false">
+                        <i class="fa-solid fa-layer-group me-2"></i>WoW Forever Style
+                    </button>
+                    <button type="button" class="damage-style-btn active" data-damage-style="modern" aria-pressed="true">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Modern Style
+                    </button>
                 </div>
+                <div id="damage-style-label" class="damage-style-label mb-4">Modern Style</div>
 
-                <div class="hero-showcase px-3">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png"
-                         alt="Preph's Damage Meter overview"
-                         class="img-fluid showcase-img w-100"
+                <div class="hero-showcase damage-hero-showcase px-3">
+                    <img id="damage-style-image"
+                         src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png"
+                         alt="Preph's Damage Meter Modern Style overview"
+                         class="img-fluid showcase-img w-100 damage-hero-image"
                          style="max-width: 1000px;">
                 </div>
             </div>
@@ -781,6 +846,51 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
+
+    <script>
+        // Damage Meter visual style switcher
+        (() => {
+            const image = document.getElementById('damage-style-image');
+            const label = document.getElementById('damage-style-label');
+            const buttons = document.querySelectorAll('[data-damage-style]');
+
+            if (!image || !label || !buttons.length) return;
+
+            const styles = {
+                modern: {
+                    src: 'https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png',
+                    alt: "Preph's Damage Meter Modern Style overview",
+                    label: 'Modern Style'
+                },
+                forever: {
+                    src: 'https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview-forever.png',
+                    alt: "Preph's Damage Meter WoW Forever Style overview",
+                    label: 'WoW Forever Style'
+                }
+            };
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const selected = styles[button.dataset.damageStyle];
+                    if (!selected || image.src.endsWith(selected.src)) return;
+
+                    buttons.forEach(btn => {
+                        const active = btn === button;
+                        btn.classList.toggle('active', active);
+                        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                    });
+
+                    image.classList.add('is-switching');
+                    window.setTimeout(() => {
+                        image.src = selected.src;
+                        image.alt = selected.alt;
+                        label.textContent = selected.label;
+                    }, 90);
+                    window.setTimeout(() => image.classList.remove('is-switching'), 190);
+                });
+            });
+        })();
+    </script>
 
     <script>
         // Product tab switching
