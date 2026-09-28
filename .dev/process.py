@@ -6,15 +6,25 @@ import shutil
 import subprocess
 from pathlib import Path
 
+
+# ---------------------------------------------------------------------------
+# Config / paths
+# ---------------------------------------------------------------------------
+
 def get_script_paths():
     """Defines and returns the core paths based on the script's execution location."""
     script_dir = Path(__file__).resolve().parent  # ./.dev/
     root_dir = script_dir.parent                  # ./
-    addon_dir = root_dir / "PrephUI"              # ./PrephUI/
     packaged_dir = root_dir / ".packaged"         # ./.packaged/
     globalvars_path = script_dir / "globalvars.preph"
-    
-    return script_dir, root_dir, addon_dir, packaged_dir, globalvars_path
+
+    return script_dir, root_dir, packaged_dir, globalvars_path
+
+
+def rel_path(root_dir, value):
+    """Resolves a config path (may contain Windows backslashes) against the repo root."""
+    return root_dir / Path(value.replace("\\", "/"))
+
 
 def load_globalvars(globalvars_path):
     """Loads the global configuration from the JSON file."""
@@ -24,26 +34,67 @@ def load_globalvars(globalvars_path):
     with open(globalvars_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def generate_folder_junction(wow_addon_dir_str, addon_dir):
+
+def build_projects(cfg, root_dir):
+    """Normalises the 'projects' list from the config into resolved project dicts.
+
+    Required per project: name, version {major, minor, patch}
+    Optional per project (defaults in brackets):
+        folder    [name]              addon folder relative to the repo root
+        toc       [<folder>/<name>.toc]
+        readme    [<folder>/README.md]
+        changelog                     lua file containing `local changelogText = [[ ]]`
+                                      (changelog step is skipped when omitted)
+        github_url, curseforge_url    written into the Lua file headers
+                                      (the line is left out when omitted)
+    """
+    projects = []
+    for raw in cfg.get("projects", []):
+        name = raw["name"]
+        folder = raw.get("folder", name)
+        v = raw["version"]
+
+        projects.append({
+            "name": name,
+            "folder": folder,
+            "addon_dir": root_dir / folder,
+            "toc_path": rel_path(root_dir, raw["toc"]) if "toc" in raw
+                        else root_dir / folder / f"{name}.toc",
+            "readme_path": rel_path(root_dir, raw["readme"]) if "readme" in raw
+                           else root_dir / folder / "README.md",
+            "changelog_lua_path": rel_path(root_dir, raw["changelog"]) if raw.get("changelog") else None,
+            "github_url": raw.get("github_url"),
+            "curseforge_url": raw.get("curseforge_url"),
+            "version_string": f'{v["major"]}.{v["minor"]}.{v["patch"]}',
+        })
+    return projects
+
+
+# ---------------------------------------------------------------------------
+# Per-project steps
+# ---------------------------------------------------------------------------
+
+def generate_folder_junction(wow_addon_dir_str, project):
     """Generates a folder junction to the WoW Addon directory if it doesn't exist."""
-    print("\n--- Generating Folder Junction ---")
+    name = project["name"]
+    print(f"\n--- [{name}] Generating Folder Junction for: {wow_addon_dir_str} ---")
     wow_addon_dir = Path(wow_addon_dir_str)
-    
+
     if not wow_addon_dir.exists():
         print(f"Error: WoW Addon directory not found at {wow_addon_dir}")
         return
 
-    dest_path = wow_addon_dir / "PrephUI"
+    dest_path = wow_addon_dir / project["folder"]
 
     if dest_path.exists():
         print(f"Skipped: Destination already exists at {dest_path}")
         return
 
     safe_dest = os.path.normpath(str(dest_path))
-    safe_source = os.path.normpath(str(addon_dir))
-    
+    safe_source = os.path.normpath(str(project["addon_dir"]))
+
     command = f'mklink /J "{safe_dest}" "{safe_source}"'
-    
+
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True, errors="replace")
         if result.returncode == 0:
@@ -54,11 +105,14 @@ def generate_folder_junction(wow_addon_dir_str, addon_dir):
     except Exception as e:
         print(f"Exception occurred during junction creation: {e}")
 
-def update_toc_version(addon_dir, version_string):
-    """Parses the version into the PrephUI.toc file."""
-    print("\n--- Updating TOC Version ---")
-    toc_path = addon_dir / "PrephUI.toc"
-    
+
+def update_toc_version(project):
+    """Writes the project's version into its .toc file."""
+    name = project["name"]
+    version_string = project["version_string"]
+    print(f"\n--- [{name}] Updating TOC Version ---")
+    toc_path = project["toc_path"]
+
     if not toc_path.exists():
         print(f"Error: TOC file not found at {toc_path}")
         return
@@ -68,9 +122,9 @@ def update_toc_version(addon_dir, version_string):
 
     # Replaces the ## Version: <anything> line with the new version
     updated_toc = re.sub(
-        r"^(## Version:).*$", 
-        rf"\1 {version_string}", 
-        toc_content, 
+        r"^(## Version:).*$",
+        rf"\1 {version_string}",
+        toc_content,
         flags=re.MULTILINE
     )
 
@@ -81,13 +135,58 @@ def update_toc_version(addon_dir, version_string):
     else:
         print(f"Skipped: TOC version is already {version_string} or tag missing.")
 
-def update_changelog(root_dir, addon_dir, changelog_lua_rel_path):
-    """Parses the README.md changelog and injects it into the specified Lua file."""
-    print("\n--- Updating Changelog in Lua ---")
-    readme_path = addon_dir / "README.md"
-    
+
+def markdown_changelog_to_addon_format(changelog_md):
+    """Converts the raw '## Changelog' markdown section from the README into
+    the addon's colored/bulleted changelog text used inside `changelogText`
+    (e.g. '### V0.1.14' -> '|cffffd100V0.1.14|r', '  - foo' -> '  • foo',
+    blank lines between categories collapsed, versions separated by a
+    tooltip-divider texture)."""
+    # Drop the leading '## Changelog' heading itself
+    body = re.sub(r"^##\s*Changelog\s*\n+", "", changelog_md.strip(), count=1)
+
+    # Split on version headings ('### V1.2.3'), keeping the heading text
+    pieces = re.split(r"^###\s+(.+?)\s*$", body, flags=re.MULTILINE)
+
+    version_blocks = []
+    for i in range(1, len(pieces), 2):
+        title = pieces[i].strip()
+        section_body = pieces[i + 1] if i + 1 < len(pieces) else ""
+        version_blocks.append((title, section_body))
+
+    rendered_versions = []
+    for title, section_body in version_blocks:
+        rendered_lines = [f"|cffffd100{title}|r"]
+        for line in section_body.split("\n"):
+            if not line.strip():
+                continue  # collapse blank lines within a version's body
+            bullet_match = re.match(r"^(\s*)-\s?(.*)$", line)
+            if bullet_match:
+                indent, text = bullet_match.groups()
+                rendered_lines.append(f"{indent}\u2022 {text}".rstrip())
+            else:
+                rendered_lines.append(line.rstrip())
+        rendered_versions.append("\n".join(rendered_lines))
+
+    divider = "\n\n|TInterface\\Common\\UI-TooltipDivider:5:400:0:0|t\n\n"
+    return divider.join(rendered_versions)
+
+
+def update_changelog(project):
+    """Parses the project's README changelog, converts it to the addon's colored
+    changelog format, and injects it into the `changelogText` variable of the
+    project's changelog Lua file, leaving the rest of that file untouched."""
+    name = project["name"]
+    print(f"\n--- [{name}] Updating Changelog in Lua ---")
+
+    changelog_lua_path = project["changelog_lua_path"]
+    if changelog_lua_path is None:
+        print("Skipped: No 'changelog' file configured for this project.")
+        return
+
+    readme_path = project["readme_path"]
     if not readme_path.exists():
-        print(f"Error: README.md not found at {readme_path}")
+        print(f"Error: README not found at {readme_path}")
         return
 
     with open(readme_path, 'r', encoding='utf-8') as f:
@@ -96,58 +195,80 @@ def update_changelog(root_dir, addon_dir, changelog_lua_rel_path):
     # Extract everything from '## Changelog' to the end of the file
     changelog_match = re.search(r"(## Changelog\n.*)", readme_content, re.DOTALL)
     if not changelog_match:
-        print("Error: Could not find '## Changelog' section in README.md")
+        print(f"Error: Could not find '## Changelog' section in {readme_path.name}")
         return
-    
-    changelog_text = changelog_match.group(1).strip()
-    
-    # Resolve the lua path. The JSON might have 'PrephUI\Modules\...' so we resolve it from root
-    changelog_lua_path = root_dir / changelog_lua_rel_path
+
+    addon_changelog_text = markdown_changelog_to_addon_format(changelog_match.group(1))
 
     if not changelog_lua_path.exists():
-        print(f"Warning: Changelog lua file {changelog_lua_path} does not exist. Creating it.")
-        changelog_lua_path.parent.mkdir(parents=True, exist_ok=True)
-        original_lua_content = ""
-    else:
-        with open(changelog_lua_path, 'r', encoding='utf-8') as f:
-            original_lua_content = f.read()
+        print(f"Error: Changelog lua file {changelog_lua_path} does not exist.")
+        return
 
-    # Create the Lua string block using [=[ ]=] to avoid quote escaping issues
-    lua_changelog_variable = f"PrephUI_Changelog = [=[\n{changelog_text}\n]=]\n"
+    with open(changelog_lua_path, 'r', encoding='utf-8') as f:
+        original_lua_content = f.read()
 
-    # Regex to find and replace an existing PrephUI_Changelog assignment, or append if missing
-    existing_var_pattern = re.compile(r"PrephUI_Changelog\s*=\s*\[=\[.*?\]=\]", re.DOTALL)
-    
-    if existing_var_pattern.search(original_lua_content):
-        updated_lua = existing_var_pattern.sub(lua_changelog_variable.strip(), original_lua_content)
-    else:
-        updated_lua = original_lua_content + "\n" + lua_changelog_variable
+    # Replace only the contents of `local changelogText = [[ ... ]]`,
+    # leaving the rest of the file (e.g. the Settings:AddPage code) intact.
+    changelog_var_pattern = re.compile(
+        r"(local\s+changelogText\s*=\s*\[\[\n?)(.*?)(\]\])",
+        re.DOTALL
+    )
+
+    if not changelog_var_pattern.search(original_lua_content):
+        print(f"Error: Could not find 'local changelogText = [[ ... ]]' block in {changelog_lua_path.name}")
+        return
+
+    updated_lua = changelog_var_pattern.sub(
+        lambda m: f"{m.group(1)}{addon_changelog_text}{m.group(3)}",
+        original_lua_content,
+        count=1
+    )
+
+    # Clean up any stray `<Name>_Changelog = [=[ ... ]=]` blocks left behind
+    # by older/buggy runs of this script.
+    stray_var_pattern = re.compile(
+        rf"\n*{re.escape(name)}_Changelog\s*=\s*\[=\[.*?\]=\]\n*", re.DOTALL
+    )
+    updated_lua = stray_var_pattern.sub("\n", updated_lua).rstrip() + "\n"
 
     with open(changelog_lua_path, 'w', encoding='utf-8') as f:
         f.write(updated_lua)
-        
+
     print(f"Success: Parsed changelog into {changelog_lua_path.name}")
 
-def enforce_lua_headers(addon_dir):
-    """Runs the integrated headers.py logic to ensure all Lua files have the correct copyright header."""
-    print("\n--- Enforcing Lua Headers ---")
-    
-    NEW_HEADER_TEMPLATE = """--[[
-    <{rel_path}>
-    Copyright (C) 2026 Prephmage / Prephalia
-    All Rights Reserved.
 
-    This software may not be copied, modified, or distributed 
-    without the express written permission of the copyright owner.
+def enforce_lua_headers(project):
+    """Ensures all Lua files in the project have the correct copyright header."""
+    name = project["name"]
+    folder = project["folder"]
+    addon_dir = project["addon_dir"]
+    print(f"\n--- [{name}] Enforcing Lua Headers ---")
 
-    -- Additional Metadata --
-    Author:  Prephmage / Prephalia
-    CurseForge: https://www.curseforge.com/members/prephalia/projects
-    GitHub: https://github.com/JulianStiebler/WoW_PrephsFramework
---]]"""
+    # Optional metadata lines, only emitted when the project defines them
+    metadata_lines = ["    Author:  Prephmage / Prephalia"]
+    if project.get("curseforge_url"):
+        metadata_lines.append(f"    CurseForge: {project['curseforge_url']}")
+    if project.get("github_url"):
+        metadata_lines.append(f"    GitHub: {project['github_url']}")
+    metadata_block = "\n".join(metadata_lines)
+
+    # Doubled braces are literal; {rel_path} is filled in per file below
+    NEW_HEADER_TEMPLATE = (
+        "--[[\n"
+        "    <{rel_path}>\n"
+        "    Copyright (C) 2026 Prephmage / Prephalia\n"
+        "    All Rights Reserved.\n"
+        "\n"
+        "    This software may not be copied, modified, or distributed \n"
+        "    without the express written permission of the copyright owner.\n"
+        "\n"
+        "    -- Additional Metadata --\n"
+        + metadata_block.replace("{", "{{").replace("}", "}}") + "\n"
+        "--]]"
+    )
 
     HEADER_REGEX = re.compile(
-        r"--\[\[\s*\n\s*<(.*?)>\s*\n\s*Copyright \(C\) (?:<)?2026(?:>)? (?:<)?Prephmage / Prephalia(?:>)?.*?--\]\]", 
+        r"--\[\[\s*\n\s*<(.*?)>\s*\n\s*Copyright \(C\) (?:<)?2026(?:>)? (?:<)?Prephmage / Prephalia(?:>)?.*?--\]\]",
         re.DOTALL
     )
 
@@ -161,22 +282,20 @@ def enforce_lua_headers(addon_dir):
         for filename in filenames:
             if filename.endswith(".lua"):
                 file_path = os.path.join(dirpath, filename)
-                rel_path = os.path.relpath(file_path, addon_dir)
-                
-                # Format for the addon root structure (PrephUI/...)
-                formatted_rel_path = os.path.join("PrephUI", rel_path).replace("/", "\\")
-                
+                file_rel = os.path.relpath(file_path, addon_dir)
+
+                # Format for the addon root structure (<folder>\...)
+                formatted_rel_path = os.path.join(folder, file_rel).replace("/", "\\")
+
                 with open(file_path, 'r', encoding='utf-8') as f:
                     original_content = f.read()
-                
+
                 expected_new_header = NEW_HEADER_TEMPLATE.format(rel_path=formatted_rel_path)
                 match = HEADER_REGEX.search(original_content)
-                
+
                 if match:
                     existing_header = match.group(0)
-                    if existing_header == expected_new_header:
-                        pass # Silently skip if already perfect
-                    else:
+                    if existing_header != expected_new_header:
                         new_content = original_content[:match.start()] + expected_new_header + original_content[match.end():]
                         with open(file_path, 'w', encoding='utf-8') as f:
                             f.write(new_content)
@@ -185,19 +304,20 @@ def enforce_lua_headers(addon_dir):
                     if "Copyright (C)" in original_content and "Prephmage" in original_content:
                         print(f"Warning: Found copyright but couldn't parse the header structure correctly in {formatted_rel_path}")
                         continue
-                    
+
                     new_content = f"{expected_new_header}\n\n\n{original_content}"
                     with open(file_path, 'w', encoding='utf-8') as f:
                         f.write(new_content)
                     print(f"Success: Added new header to {formatted_rel_path}")
 
-def update_readme_toc(addon_dir):
-    """Parses changelog headers from README.md and updates the TOC automatically."""
-    print("\n--- Updating README Table of Contents ---")
-    readme_path = addon_dir / "README.md"
-    
+
+def update_readme_toc(project):
+    """Parses changelog headers from the project's README and updates its TOC automatically."""
+    print(f"\n--- [{project['name']}] Updating README Table of Contents ---")
+    readme_path = project["readme_path"]
+
     if not readme_path.exists():
-        print(f"Error: README.md not found at {readme_path}")
+        print(f"Error: README not found at {readme_path}")
         return
 
     with open(readme_path, 'r', encoding='utf-8') as f:
@@ -205,12 +325,11 @@ def update_readme_toc(addon_dir):
 
     changelog_match = re.search(r"## Changelog\s*\n(.*)", content, re.DOTALL)
     if not changelog_match:
-        print("Warning: Could not find '## Changelog' section in README.md")
+        print(f"Warning: Could not find '## Changelog' section in {readme_path.name}")
         return
 
     versions = re.findall(r"^###\s+(V[\w\.\-]+)", changelog_match.group(1), re.MULTILINE)
-    
-    # Compute the anchor slug outside of the f-string expression block
+
     toc_entries = []
     for v in versions:
         slug = re.sub(r'[^\w-]', '', v.lower())
@@ -219,53 +338,96 @@ def update_readme_toc(addon_dir):
     new_toc_block = "- [Changelog](#changelog)\n" + "\n".join(toc_entries)
 
     pattern = r"(- \[Changelog\]\(#changelog\)\n(?:\s+- \[.*?\]\(#.*?\)\n?)*)"
-    
+
     if re.search(pattern, content):
         updated_content = re.sub(pattern, new_toc_block + "\n", content, count=1)
         if updated_content != content:
             with open(readme_path, 'w', encoding='utf-8') as f:
                 f.write(updated_content)
-            print("Success: Updated README.md Table of Contents")
+            print("Success: Updated README Table of Contents")
         else:
-            print("Skipped: README.md Table of Contents is already up to date")
-            
-def package_addon(addon_dir, packaged_dir, version_string):
-    """Packages the PrephUI folder into a zip file inside the .packaged directory."""
-    print("\n--- Packaging Addon ---")
+            print("Skipped: README Table of Contents is already up to date")
+
+
+def package_addon(project, root_dir, packaged_dir):
+    """Packages the project folder into a zip file inside the .packaged directory."""
+    name = project["name"]
+    print(f"\n--- [{name}] Packaging Addon ---")
     packaged_dir.mkdir(parents=True, exist_ok=True)
-    
-    zip_filename = packaged_dir / f"PrephUI_v{version_string}"
-    
+
+    zip_filename = packaged_dir / f"{name}_v{project['version_string']}"
+
     # shutil.make_archive adds the .zip extension automatically
     shutil.make_archive(
         base_name=str(zip_filename),
         format='zip',
-        root_dir=addon_dir.parent, 
-        base_dir="PrephUI"
+        root_dir=project["addon_dir"].parent,
+        base_dir=project["addon_dir"].name
     )
-    
+
     print(f"Success: Packaged addon to {zip_filename}.zip")
 
+
+# ---------------------------------------------------------------------------
+# Orchestration
+# ---------------------------------------------------------------------------
+
+def process_project(project, wow_addon_dirs, root_dir, packaged_dir):
+    print(f"\n{'=' * 60}\nProject: {project['name']} (v{project['version_string']})\n{'=' * 60}")
+
+    if not project["addon_dir"].exists():
+        print(f"Error: Project folder not found at {project['addon_dir']}")
+        return False
+
+    for wow_addon_dir in wow_addon_dirs:
+        generate_folder_junction(wow_addon_dir, project)
+
+    update_toc_version(project)
+    update_changelog(project)
+    update_readme_toc(project)
+    enforce_lua_headers(project)
+    package_addon(project, root_dir, packaged_dir)
+    return True
+
+
 def main():
-    script_dir, root_dir, addon_dir, packaged_dir, globalvars_path = get_script_paths()
-    
-    # 1. Load configuration
+    script_dir, root_dir, packaged_dir, globalvars_path = get_script_paths()
+
     cfg = load_globalvars(globalvars_path)
-    
-    wow_addon_dir = cfg["paths"]["wow_addon_directory"]
-    version_data = cfg["version"]
-    version_string = f'{version_data["major"]}.{version_data["minor"]}.{version_data["patch"]}'
-    changelog_lua_rel_path = cfg["project"]["changelog"]
-    
-    # 2. Execute process steps
-    generate_folder_junction(wow_addon_dir, addon_dir)
-    update_toc_version(addon_dir, version_string)
-    update_changelog(root_dir, addon_dir, changelog_lua_rel_path)
-    update_readme_toc(addon_dir)
-    enforce_lua_headers(addon_dir)
-    package_addon(addon_dir, packaged_dir, version_string)
-    
+    wow_addon_dirs = cfg.get("paths", {}).get("wow_addon_directories", [])
+    projects = build_projects(cfg, root_dir)
+
+    if not projects:
+        print("Error: No projects defined under 'projects' in globalvars.preph")
+        return 1
+
+    # Optional: `python process.py PrephUI OtherAddon` to run only specific projects
+    requested = sys.argv[1:]
+    if requested:
+        known = {p["name"].lower(): p for p in projects}
+        unknown = [r for r in requested if r.lower() not in known]
+        if unknown:
+            print(f"Error: Unknown project(s): {', '.join(unknown)}")
+            print(f"Available: {', '.join(p['name'] for p in projects)}")
+            return 1
+        projects = [known[r.lower()] for r in requested]
+
+    failed = []
+    for project in projects:
+        try:
+            if not process_project(project, wow_addon_dirs, root_dir, packaged_dir):
+                failed.append(project["name"])
+        except Exception as e:
+            print(f"Exception while processing {project['name']}: {e}")
+            failed.append(project["name"])
+
+    if failed:
+        print(f"\nProcess finished with problems in: {', '.join(failed)}")
+        return 1
+
     print("\nProcess completed successfully.")
+    return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

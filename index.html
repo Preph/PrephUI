@@ -187,9 +187,143 @@
         }
         .feature-icon { font-size: 2rem; color: var(--brand-orange); margin-bottom: 15px; }
 
+
+        /* Product switcher */
+        .product-tabs {
+            position: fixed;
+            top: 62px;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            display: flex;
+            justify-content: center;
+            padding: 10px 16px;
+            background: linear-gradient(180deg, rgba(13,13,13,0.96), rgba(13,13,13,0.78));
+            border-bottom: 1px solid rgba(255, 123, 0, 0.18);
+            backdrop-filter: blur(14px);
+        }
+
+        .product-tabs-inner {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            border: 1px solid #333;
+            border-radius: 999px;
+            background: rgba(26,26,26,0.78);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+        }
+
+        .product-tab {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 9px 18px;
+            background: transparent;
+            color: #a0a0a0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .product-tab:hover {
+            color: #fff;
+            border-color: rgba(255,123,0,0.35);
+        }
+
+        .product-tab.active {
+            color: #fff;
+            background: var(--brand-orange);
+            box-shadow: 0 5px 18px rgba(255,123,0,0.25);
+        }
+
+        .product-page {
+            min-height: 100vh;
+        }
+
+        .product-page[hidden] {
+            display: none !important;
+        }
+
+        .damage-hero {
+            padding: 175px 0 70px;
+            background:
+                radial-gradient(circle at 50% 15%, rgba(255,123,0,0.12), transparent 38%),
+                linear-gradient(180deg, rgba(26,26,26,0.72) 0%, rgba(13,13,13,1) 100%);
+        }
+
+        .compat-badge {
+            border: 1px solid rgba(255,123,0,0.45);
+            background: rgba(255,123,0,0.08);
+            color: #fff;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .damage-feature-card {
+            background: rgba(13,13,13,0.82);
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 28px;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .damage-feature-card:hover {
+            border-color: var(--brand-orange);
+            transform: translateY(-4px);
+        }
+
+        .damage-showcase {
+            max-height: 430px;
+            object-fit: contain;
+            background: #080808;
+        }
+
+        .style-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: rgba(26,26,26,0.72);
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 767.98px) {
+            .product-tabs {
+                top: 56px;
+                padding: 8px 10px;
+            }
+            .product-tab {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .damage-hero {
+                padding-top: 155px;
+            }
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Product switcher -->
+    <div class="product-tabs" aria-label="Preph products">
+        <div class="product-tabs-inner" role="tablist">
+            <button class="product-tab active" id="prephui-tab" type="button" role="tab" aria-selected="true" aria-controls="prephui-page" data-product="prephui">
+                <i class="fa-solid fa-shield-halved me-2"></i>PrephUI
+            </button>
+            <button class="product-tab" id="damage-tab" type="button" role="tab" aria-selected="false" aria-controls="damage-page" data-product="damage">
+                <i class="fa-solid fa-chart-simple me-2"></i>Damage Meter
+            </button>
+        </div>
+    </div>
+
 
     <!-- Ambient Background Animation with Particles -->
     <div class="ambient-background">
@@ -220,6 +354,7 @@
         </div>
     </nav>
 
+    <main id="prephui-page" class="product-page" role="tabpanel" aria-labelledby="prephui-tab">
     <!-- Hero Section -->
     <section class="hero-section text-center border-bottom border-orange">
         <div class="container">
@@ -229,7 +364,7 @@
             </p>
             
             <div class="hero-showcase px-3">
-                <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/overview.png" alt="PrephUI Full Overview" class="img-fluid showcase-img w-100" style="max-width: 1000px;">
+                <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overview.png" alt="PrephUI Full Overview" class="img-fluid showcase-img w-100" style="max-width: 1000px;">
             </div>
         </div>
     </section>
@@ -253,7 +388,7 @@
                     </ul>
                 </div>
                 <div class="col-lg-6 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/editmode.png" alt="Edit Mode" class="img-fluid showcase-img w-100">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/editmode.png" alt="Edit Mode" class="img-fluid showcase-img w-100">
                 </div>
             </div>
         </div>
@@ -269,10 +404,10 @@
             
             <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
                 <div class="col-lg-5 order-2 order-lg-1 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/actionbars.png" alt="Actionbars" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/proccs.png" alt="Procc Overlays" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/classbar.png" alt="Classbars" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/nameplate.png" alt="Nameplates" class="img-fluid showcase-img w-100">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/actionbars.png" alt="Actionbars" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/proccs.png" alt="Procc Overlays" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/classbar.png" alt="Classbars" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/nameplate.png" alt="Nameplates" class="img-fluid showcase-img w-100">
                 </div>
                 <div class="col-lg-7 order-1 order-lg-2 ps-lg-5">
                     <h3 class="fw-bold mb-3">Combat <span class="text-orange">Clarity</span></h3>
@@ -344,8 +479,8 @@
                     </div>
                 </div>
                 <div class="col-lg-5 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/raidframe.png" alt="Raid Frames" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dispells.png" alt="Dispell Frames" class="img-fluid showcase-img mx-auto d-block" style="max-width: 250px;">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/raidframe.png" alt="Raid Frames" class="img-fluid showcase-img w-100 mb-4">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/dispells.png" alt="Dispell Frames" class="img-fluid showcase-img mx-auto d-block" style="max-width: 250px;">
                 </div>
             </div>
     </section>
@@ -361,7 +496,7 @@
                 <div class="col-md-6">
                     <div class="feature-card h-100 d-flex flex-column">
                         <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/bag.png" alt="Unified Bags" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/bag.png" alt="Unified Bags" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
                         </div>
                         <div class="mt-auto">
                             <h5 class="mb-2"><i class="fa-solid fa-briefcase text-orange me-2"></i>Unified Bags</h5>
@@ -372,7 +507,7 @@
                 <div class="col-md-6">
                     <div class="feature-card h-100 d-flex flex-column">
                         <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/chat.png" alt="Chat Skin" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/chat.png" alt="Chat Skin" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
                         </div>
                         <div class="mt-auto">
                             <h5 class="mb-2"><i class="fa-solid fa-message text-orange me-2"></i>Chat Skin</h5>
@@ -424,7 +559,7 @@
                         </div>
 
                         <div class="position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/databar.png" alt="Global Databars" class="img-fluid showcase-img w-100">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/databar.png" alt="Global Databars" class="img-fluid showcase-img w-100">
                         </div>
                     </div>
                 </div>
@@ -444,7 +579,7 @@
                 <div class="col-md-6">
                     <div class="feature-card h-100 d-flex flex-column">
                         <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/raidcontrol.png" alt="Raid Control" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/raidcontrol.png" alt="Raid Control" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
                         </div>
                         <div class="mt-auto">
                             <h5 class="mb-2"><i class="fa-solid fa-chess-board text-orange me-2"></i>Raid Control</h5>
@@ -455,7 +590,7 @@
                 <div class="col-md-6">
                     <div class="feature-card h-100 d-flex flex-column">
                         <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/autoinvite.png" alt="AutoInviter" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
+                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/autoinvite.png" alt="AutoInviter" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
                         </div>
                         <div class="mt-auto">
                             <h5 class="mb-2"><i class="fa-solid fa-robot text-orange me-2"></i>AutoInviter</h5>
@@ -481,9 +616,196 @@
         </div>
     </footer>
 
+    </main>
+
+
+    <!-- Damage Meter Product Page -->
+    <main id="damage-page" class="product-page" role="tabpanel" aria-labelledby="damage-tab" hidden>
+        <section class="damage-hero text-center border-bottom border-orange">
+            <div class="container">
+                <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+                    <span class="compat-badge"><i class="fa-solid fa-circle-check text-orange me-1"></i>Retail 12.1 compatible</span>
+                    <span class="compat-badge"><i class="fa-solid fa-circle-check text-orange me-1"></i>WoW Forever compatible</span>
+                </div>
+
+                <h1 class="display-3 fw-bold mb-4">Know Your <span class="text-orange">Damage</span></h1>
+                <p class="lead mb-4 mx-auto" style="max-width: 820px; color: var(--text-muted);">
+                    A modern, lightweight damage meter built for World of Warcraft. Get the combat information you need at a glance,
+                    with a familiar WoW-style presentation and a clean modern option.
+                </p>
+
+                <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+                    <span class="style-chip"><i class="fa-solid fa-layer-group text-orange"></i>WoW Forever style</span>
+                    <span class="style-chip"><i class="fa-solid fa-wand-magic-sparkles text-orange"></i>Modern style</span>
+                </div>
+
+                <div class="hero-showcase px-3">
+                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png"
+                         alt="Preph's Damage Meter overview"
+                         class="img-fluid showcase-img w-100"
+                         style="max-width: 1000px;">
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 bg-surface">
+            <div class="container py-5">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Built Around <span class="text-orange">Combat Clarity</span></h2>
+                    <p class="text-muted mx-auto" style="max-width: 720px;">
+                        Familiar combat-meter information, presented in a compact interface that fits naturally into a modern WoW setup.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="damage-feature-card">
+                            <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <h4 class="fw-bold">Damage & Healing</h4>
+                            <p class="text-muted mb-0">
+                                Keep damage, healing, threat and encounter information visible without turning your screen into a wall of panels.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="damage-feature-card">
+                            <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
+                            <h4 class="fw-bold">Configurable</h4>
+                            <p class="text-muted mb-0">
+                                Adjust window count, bar height, spacing, font, opacity, scale and refresh behaviour to match your UI.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="damage-feature-card">
+                            <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+                            <h4 class="fw-bold">Two Visual Styles</h4>
+                            <p class="text-muted mb-0">
+                                Switch between a classic WoW Forever-inspired presentation and the cleaner modern style.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5">
+            <div class="container py-5">
+                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
+                    <div class="col-lg-7 order-2 order-lg-1">
+                        <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview-forever.png"
+                             alt="Damage Meter WoW Forever style"
+                             class="img-fluid showcase-img w-100 damage-showcase">
+                    </div>
+                    <div class="col-lg-5 order-1 order-lg-2">
+                        <h3 class="fw-bold mb-3">WoW Forever <span class="text-orange">Style</span></h3>
+                        <p class="text-muted">
+                            A familiar, compact damage-meter look for players who prefer the classic WoW presentation.
+                            The example shows separate combat windows for damage, threat, healing and short-duration damage.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Classic presentation</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Compact windows</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Combat-focused</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
+                    <div class="col-lg-7">
+                        <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png"
+                             alt="Damage Meter modern style"
+                             class="img-fluid showcase-img w-100 damage-showcase">
+                    </div>
+                    <div class="col-lg-5">
+                        <h3 class="fw-bold mb-3">Modern <span class="text-orange">Style</span></h3>
+                        <p class="text-muted">
+                            A clean modern presentation for current Retail-style setups, with compact bars, clear typography and a focused layout.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <span class="badge bg-dark border border-orange text-orange px-3 py-2">Modern UI</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Scalable</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Readable</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-5 order-2 order-lg-1">
+                        <h3 class="fw-bold mb-3">Powerful <span class="text-orange">Settings</span></h3>
+                        <p class="text-muted">
+                            Fine-tune the meter to your setup. Configure windows, bar height, spacing, font size, opacity, scale and refresh behaviour,
+                            while choosing how the meter behaves when combat starts and how it interacts with the Blizzard damage meter.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Window layout</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Behaviour</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Typography</span>
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">Scaling</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 order-1 order-lg-2">
+                        <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/settings.png"
+                             alt="Preph's Damage Meter settings"
+                             class="img-fluid showcase-img w-100 damage-showcase">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 bg-surface">
+            <div class="container py-5 text-center">
+                <h2 class="fw-bold mb-3">Your Combat Data, <span class="text-orange">Your Layout</span></h2>
+                <p class="text-muted mx-auto mb-4" style="max-width: 720px;">
+                    Designed to complement PrephUI while remaining useful as a focused damage meter on its own.
+                    Pick the presentation that fits your character, your screen and your playstyle.
+                </p>
+                <a href="https://github.com/Preph/PrephUI" target="_blank" class="btn btn-orange px-4">
+                    <i class="fa-brands fa-github me-2"></i>View Source
+                </a>
+            </div>
+        </section>
+
+        <footer class="py-4 text-center" style="background-color: rgba(13,13,13,0.9); border-top: 2px solid var(--brand-orange); position: relative; z-index: 10;">
+            <div class="container">
+                <p class="mb-0 text-muted" style="font-size: 0.95rem;">&copy; Prephalia 2026</p>
+                <div class="mt-3">
+                    <a href="https://github.com/Preph/PrephUI" target="_blank" class="text-muted me-3 text-decoration-none hover-orange"><i class="fa-brands fa-github fs-5"></i></a>
+                    <a href="https://www.curseforge.com/wow/addons/prephui" target="_blank" class="text-muted me-3 text-decoration-none hover-orange" title="CurseForge"><i class="fa-solid fa-puzzle-piece fs-5"></i></a>
+                    <a href="#" class="text-muted text-decoration-none hover-orange"><i class="fa-brands fa-discord fs-5"></i></a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
+
+    <script>
+        // Product tab switching
+        document.querySelectorAll('.product-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const product = tab.dataset.product;
+                const isDamage = product === 'damage';
+
+                document.querySelectorAll('.product-tab').forEach(t => {
+                    const active = t === tab;
+                    t.classList.toggle('active', active);
+                    t.setAttribute('aria-selected', active ? 'true' : 'false');
+                });
+
+                document.getElementById('prephui-page').hidden = isDamage;
+                document.getElementById('damage-page').hidden = !isDamage;
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.title = isDamage
+                    ? "Preph's Damage Meter - PrephUI"
+                    : "PrephUI - Modern WoW Interface";
+            });
+        });
+    </script>
+
     <!-- Particle Engine Script -->
     <script>
         const canvas = document.getElementById('particleCanvas');

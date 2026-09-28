@@ -1,0 +1,153 @@
+1x [ADDON_ACTION_BLOCKED] AddOn 'PrephUI' tried to call the protected function 'PrephsUI_RaidControl:Show()'.
+[!BugGrabber/BugGrabber.lua]:554: in function '?'
+[!BugGrabber/BugGrabber.lua]:538: in function <!BugGrabber/BugGrabber.lua:538>
+[C]: in function 'Show'
+[PrephUI/Modules/RaidTools/RaidToolsControl.lua]:423: in function 'UpdateRoster'
+[PrephUI/Modules/RaidTools/RaidToolsControl.lua]:365: in function <...ddOns/PrephUI/Modules/RaidTools/RaidToolsControl.lua:364>
+
+
+Locals:
+self=<table>
+event="ADDON_ACTION_BLOCKED"
+addonName="PrephUI"
+addonFunc="PrephsUI_RaidControl:Show()"
+name="PrephUI"
+badAddons=<table>{
+ PrephUI=true
+}
+L=<table>{
+ NO_DISPLAY_2="|cffffff00The standard display is called BugSack, and can probably be found on the same site where you found !BugGrabber.|r"
+ ERROR_DETECTED="%s |cffffff00captured, click the link for more information.|r"
+ BUGGRABBER_STOPPED="|cffffff00There are too many errors in your UI. As a result, your game experience may be degraded. Disable or update the failing addons if you don't want to see this message again.|r"
+ USAGE="|cffffff00Usage: /buggrabber <1-%d>.|r"
+ STOP_NAG="|cffffff00!BugGrabber will not nag about missing a display addon again until next patch.|r"
+ NO_DISPLAY_STOP="|cffffff00If you don't want to be reminded about this again, run /stopnag.|r"
+ NO_DISPLAY_1="|cffffff00You seem to be running !BugGrabber with no display addon to go along with it. Although a slash command is provided for accessing error reports, a display can help you manage these errors in a more convenient way.|r"
+ ERROR_UNABLE="|cffffff00!BugGrabber is unable to retrieve errors from other players by itself. Please install BugSack or a similar display addon that might give you this functionality.|r"
+ ADDON_CALL_PROTECTED="[%s] AddOn '%s' tried to call the protected function '%s'."
+}
+
+---
+
+12x ...ddOns/Blizzard_UnitFrame/Shared/CompactUnitFrame.lua:1206: attempt to compare local 'maxHealth' (a secret number value, while execution tainted by 'PrephUI')
+[Blizzard_UnitFrame/Shared/CompactUnitFrame.lua]:1206: in function 'CompactUnitFrame_UpdateHealPrediction'
+[Blizzard_UnitFrame/Shared/CompactUnitFrame.lua]:461: in function 'CompactUnitFrame_UpdateAll'
+[Blizzard_UnitFrame/Shared/CompactUnitFrame.lua]:277: in function 'CompactUnitFrame_SetUnit'
+[Blizzard_NamePlates/Blizzard_NamePlateBase.lua]:69: in function 'ApplyFrameOptions'
+[Blizzard_NamePlates/Blizzard_NamePlateBase.lua]:32: in function 'SetUnit'
+[Blizzard_NamePlates/Blizzard_NamePlates.lua]:171: in function 'OnNamePlateAdded'
+[Blizzard_NamePlates/Blizzard_NamePlates.lua]:57: in function <...eBlizzard_NamePlates/Blizzard_NamePlates.lua:48>
+
+
+Locals:
+frame=Button <Blizzard_NamePlateBase.lua:18>{
+ classificationIndicator=Texture <Blizzard_NamePlates.xml:202>
+ displayAggroHighlight=false
+ aggroHighlightTextures=<table>
+ HealthBarsContainer=Frame <Blizzard_NamePlates.xml:103>
+ maxDispelDebuffs=0
+ displayAggroFlash=false
+ SoftTargetFrame=Frame <Blizzard_NamePlates.xml:260>
+ myHealPrediction=Texture <Blizzard_NamePlates.xml:129>
+ needsUpdate=true
+ overHealAbsorbGlow=Texture <Blizzard_NamePlates.xml:162>
+ maxDebuffs=0
+ disableMouse=true
+ LoseAggroAnim=AnimationGroup <Blizzard_NamePlates.xml:343>
+ displayThreatHealthBarColor=false
+ aggroHighlightBase=Texture <Blizzard_NamePlates.xml:309>
+ newUnit=true
+ hideRealmName=true
+ colorNameWithClassColor=true
+ maxBuffs=0
+ totalAbsorbOverlay=Texture <Blizzard_NamePlates.xml:134>
+ aggroHighlightShown=false
+ displayedUnit="nameplate9"
+ healPredictionDirty=true
+ WidgetContainer=Frame <Blizzard_NamePlates.xml:179>
+ myHealAbsorbLeftShadow=Texture <Blizzard_NamePlates.xml:155>
+ AggroHighlightFadeOutAnim=AnimationGroup <Blizzard_NamePlates.xml:351>
+ inVehicle=false
+ unit="nameplate9"
+ behindCameraIcon=Texture <Blizzard_NamePlates.xml:285>
+ AggroHighlightFadeInAnim=AnimationGroup <Blizzard_NamePlates.xml:347>
+ namePlateFrame=NamePlate27 <UnknownFile:0>
+ optionTable=<table>
+ AggroHighlightScrollAnim=AnimationGroup <Blizzard_NamePlates.xml:355>
+ unitExists=true
+ myHealAbsorbRightShadow=Texture <Blizzard_NamePlates.xml:156>
+ totalAbsorb=Texture <Blizzard_NamePlates.xml:131>
+ name=FontString <Blizzard_NamePlates.xml:293>
+ hideCastbar=false
+ overAbsorbGlow=Texture <Blizzard_NamePlates.xml:161>
+ ignoreCUFNameRequirement=true
+ selectionHighlight=Texture <Blizzard_NamePlates.xml:298>
+ otherHealPrediction=Texture <Blizzard_NamePlates.xml:130>
+ healthBar=StatusBar <Blizzard_NamePlates.xml:105>
+ AurasFrame=Frame <Blizzard_NamePlates.xml:216>
+ ClassificationFrame=Frame <Blizzard_NamePlates.xml:195>
+ powerBarUsedHeight=0
+ aggroFlash=Texture <Blizzard_NamePlates.xml:333>
+ aggroHighlightMask=MaskTexture <Blizzard_NamePlates.xml:321>
+ aggroHighlightAdditive=Texture <Blizzard_NamePlates.xml:315>
+ aggroHighlight=Texture <Blizzard_NamePlates.xml:306>
+ PlayerLevelDiffFrame=Frame <Blizzard_NamePlates.xml:258>
+ CastBarsContainer=Frame <Blizzard_NamePlates.xml:172>
+ LevelFrame=Frame <Blizzard_NamePlates.xml:272>
+ myHealAbsorb=Texture <Blizzard_NamePlates.xml:154>
+ RaidTargetFrame=Frame <Blizzard_NamePlates.xml:185>
+ isLootObject=false
+}
+_=<secret number>
+maxHealth=<secret number>
+health=<secret number>
+(*temporary)=StatusBar <Blizzard_NamePlates.xml:105>{
+ capNumericDisplay=true
+ bgTexture=Texture <Blizzard_NamePlates.xml:113>
+ lockShow=0
+ barTexture=Texture <Blizzard_NamePlates.xml:106>
+ disableMaxValue=true
+ myHealPrediction=Texture <Blizzard_NamePlates.xml:129>
+ unitNameFontString=FontString <Blizzard_NamePlates.xml:293>
+ overHealAbsorbGlow=Texture <Blizzard_NamePlates.xml:162>
+ widgetsOnly=false
+ deselectedOverlay=Texture <Blizzard_NamePlates.xml:121>
+ showPercentage=true
+ isSimplified=false
+ RightText=FontString <Blizzard_NamePlates.xml:147>
+ TextString=FontString <Blizzard_NamePlates.xml:137>
+ showNumeric=false
+ overAbsorbGlow=Texture <Blizzard_NamePlates.xml:161>
+ controlsShownState=false
+ isGameObject=false
+ showOnlyName=false
+ isPlayer=true
+ forceShow=true
+ isFocus=false
+ shouldUseSelectedBorder=true
+ isTarget=false
+ myHealAbsorb=Texture <Blizzard_NamePlates.xml:154>
+ myHealAbsorbRightShadow=Texture <Blizzard_NamePlates.xml:156>
+ myHealAbsorbLeftShadow=Texture <Blizzard_NamePlates.xml:155>
+ Text=FontString <Blizzard_NamePlates.xml:137>
+ totalAbsorbOverlay=Texture <Blizzard_NamePlates.xml:134>
+ LeftText=FontString <Blizzard_NamePlates.xml:142>
+ totalAbsorb=Texture <Blizzard_NamePlates.xml:131>
+ selectedBorder=Texture <Blizzard_NamePlates.xml:118>
+ otherHealPrediction=Texture <Blizzard_NamePlates.xml:130>
+}
+(*temporary)=<secret number>
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*temporary)=nil
+(*t

@@ -1,17 +1,39 @@
 {
-    "project": {
-        "name": "PrephUI",
-        "author": "Julian Stiebler",
-        "github_url": "https://github.com/yourusername/PrephUI",
-        "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
-        "changelog": "PrephUI\\Modules\\General\\ChangelogSettings.lua"
-    },
     "paths": {
-        "wow_addon_directory": "C:\\Games\\Battle.net\\World of Warcraft\\_classic_era_\\Interface\\AddOns"
+        "wow_addon_directories": [
+            "C:\\Games\\Battle.net\\World of Warcraft\\_classic_beta_\\Interface\\AddOns",
+            "C:\\Games\\Battle.net\\World of Warcraft\\_retail_\\Interface\\AddOns"
+        ]
     },
-    "version": {
-        "major": 0,
-        "minor": 0,
-        "patch": 9
-    }
+    "projects": [
+        {
+            "name": "PrephUI",
+            "folder": "PrephUI",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
+            "readme": "PrephUI\\README.md",
+            "changelog": "PrephUI\\Modules\\General\\ChangelogSettings.lua",
+            "version": {
+                "major": 0,
+                "minor": 1,
+                "patch": 14
+            }
+        },
+        {
+            "name": "PrephDamageMeter",
+            "folder": "PrephDamageMeter",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephDamageMeter",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/PrephDamageMeter",
+            "readme": "PrephDamageMeter\\README.md",
+            "changelog": "PrephDamageMeter\\Changelog.lua",
+            "version": {
+                "major": 0,
+                "minor": 0,
+                "patch": 1
+            }
+        }
+    ]
+
 }
