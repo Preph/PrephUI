@@ -893,27 +893,72 @@
     </script>
 
     <script>
-        // Product tab switching
-        document.querySelectorAll('.product-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const product = tab.dataset.product;
+        // Product tab switching + shareable GitHub Pages hash URL.
+        // This stays on the same index.html; #damage-meter is only a URL fragment.
+        (() => {
+            const tabs = document.querySelectorAll('.product-tab');
+            const prephuiPage = document.getElementById('prephui-page');
+            const damagePage = document.getElementById('damage-page');
+
+            if (!tabs.length || !prephuiPage || !damagePage) return;
+
+            const titles = {
+                prephui: 'PrephUI - Modern WoW Interface',
+                damage: "Preph's Damage Meter - PrephUI"
+            };
+
+            function setProduct(product, { updateUrl = false, scroll = true } = {}) {
                 const isDamage = product === 'damage';
 
-                document.querySelectorAll('.product-tab').forEach(t => {
-                    const active = t === tab;
-                    t.classList.toggle('active', active);
-                    t.setAttribute('aria-selected', active ? 'true' : 'false');
+                tabs.forEach(tab => {
+                    const active = tab.dataset.product === product;
+                    tab.classList.toggle('active', active);
+                    tab.setAttribute('aria-selected', active ? 'true' : 'false');
                 });
 
-                document.getElementById('prephui-page').hidden = isDamage;
-                document.getElementById('damage-page').hidden = !isDamage;
+                prephuiPage.hidden = isDamage;
+                damagePage.hidden = !isDamage;
+                document.title = isDamage ? titles.damage : titles.prephui;
 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                document.title = isDamage
-                    ? "Preph's Damage Meter - PrephUI"
-                    : "PrephUI - Modern WoW Interface";
+                if (updateUrl) {
+                    const url = new URL(window.location.href);
+                    url.hash = isDamage ? 'damage-meter' : '';
+                    window.history.pushState({ product }, '', url);
+                }
+
+                if (scroll) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            function productFromHash() {
+                return window.location.hash.toLowerCase() === '#damage-meter'
+                    ? 'damage'
+                    : 'prephui';
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    setProduct(tab.dataset.product, {
+                        updateUrl: true,
+                        scroll: !tab.classList.contains('active')
+                    });
+                });
             });
-        });
+
+            // Open the correct product directly from a shared URL.
+            setProduct(productFromHash(), { updateUrl: false, scroll: false });
+
+            // Browser Back / Forward.
+            window.addEventListener('popstate', () => {
+                setProduct(productFromHash(), { updateUrl: false, scroll: true });
+            });
+
+            // Manual hash changes.
+            window.addEventListener('hashchange', () => {
+                setProduct(productFromHash(), { updateUrl: false, scroll: true });
+            });
+        })();
     </script>
 
     <!-- Particle Engine Script -->
