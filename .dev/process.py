@@ -4,6 +4,7 @@ import re
 import json
 import shutil
 import subprocess
+import zipfile
 from pathlib import Path
 
 
@@ -38,21 +39,22 @@ def load_globalvars(globalvars_path):
 def build_projects(cfg, root_dir):
     """Normalises the 'projects' list from the config into resolved project dicts.
 
-    Required per project: name, version {major, minor, patch}
-    Optional per project (defaults in brackets):
-        folder    [name]              addon folder relative to the repo root
-        toc       [<folder>/<name>.toc]
-        readme    [<folder>/README.md]
-        changelog                     lua file containing `local changelogText = [[ ]]`
-                                      (changelog step is skipped when omitted)
-        github_url, curseforge_url    written into the Lua file headers
-                                      (the line is left out when omitted)
+    Optional per project:
+        version         {major, minor, patch} (packaging skipped when omitted)
+        folder          [name]               addon folder relative to the repo root
+        toc             [<folder>/<name>.toc]
+        readme          [<folder>/README.md]
+        changelog                            lua file containing `local changelogText = [[ ]]`
+        github_url, curseforge_url           written into the Lua file headers
+        alsoBundleThese                      list of extra folders to bundle into the zip
     """
     projects = []
     for raw in cfg.get("projects", []):
         name = raw["name"]
         folder = raw.get("folder", name)
-        v = raw["version"]
+        v = raw.get("version")
+
+        version_string = f'{v["major"]}.{v["minor"]}.{v["patch"]}' if v else None
 
         projects.append({
             "name": name,
@@ -65,7 +67,8 @@ def build_projects(cfg, root_dir):
             "changelog_lua_path": rel_path(root_dir, raw["changelog"]) if raw.get("changelog") else None,
             "github_url": raw.get("github_url"),
             "curseforge_url": raw.get("curseforge_url"),
-            "version_string": f'{v["major"]}.{v["minor"]}.{v["patch"]}',
+            "version_string": version_string,
+            "also_bundle": [rel_path(root_dir, extra) for extra in raw.get("alsoBundleThese", [])],
         })
     return projects
 
@@ -111,16 +114,19 @@ def update_toc_version(project):
     name = project["name"]
     version_string = project["version_string"]
     print(f"\n--- [{name}] Updating TOC Version ---")
-    toc_path = project["toc_path"]
 
+    if not version_string:
+        print("Skipped: No version specified for this project.")
+        return
+
+    toc_path = project["toc_path"]
     if not toc_path.exists():
-        print(f"Error: TOC file not found at {toc_path}")
+        print(f"Skipped: TOC file not found at {toc_path}")
         return
 
     with open(toc_path, 'r', encoding='utf-8') as f:
         toc_content = f.read()
 
-    # Replaces the ## Version: <anything> line with the new version
     updated_toc = re.sub(
         r"^(## Version:).*$",
         rf"\1 {version_string}",
@@ -137,15 +143,9 @@ def update_toc_version(project):
 
 
 def markdown_changelog_to_addon_format(changelog_md):
-    """Converts the raw '## Changelog' markdown section from the README into
-    the addon's colored/bulleted changelog text used inside `changelogText`
-    (e.g. '### V0.1.14' -> '|cffffd100V0.1.14|r', '  - foo' -> '  • foo',
-    blank lines between categories collapsed, versions separated by a
-    tooltip-divider texture)."""
-    # Drop the leading '## Changelog' heading itself
+    """Converts raw '## Changelog' markdown section from README into colored Lua changelog format."""
     body = re.sub(r"^##\s*Changelog\s*\n+", "", changelog_md.strip(), count=1)
 
-    # Split on version headings ('### V1.2.3'), keeping the heading text
     pieces = re.split(r"^###\s+(.+?)\s*$", body, flags=re.MULTILINE)
 
     version_blocks = []
@@ -159,7 +159,7 @@ def markdown_changelog_to_addon_format(changelog_md):
         rendered_lines = [f"|cffffd100{title}|r"]
         for line in section_body.split("\n"):
             if not line.strip():
-                continue  # collapse blank lines within a version's body
+                continue
             bullet_match = re.match(r"^(\s*)-\s?(.*)$", line)
             if bullet_match:
                 indent, text = bullet_match.groups()
@@ -173,9 +173,7 @@ def markdown_changelog_to_addon_format(changelog_md):
 
 
 def update_changelog(project):
-    """Parses the project's README changelog, converts it to the addon's colored
-    changelog format, and injects it into the `changelogText` variable of the
-    project's changelog Lua file, leaving the rest of that file untouched."""
+    """Parses README changelog and injects it into the configured changelog Lua file."""
     name = project["name"]
     print(f"\n--- [{name}] Updating Changelog in Lua ---")
 
@@ -186,13 +184,12 @@ def update_changelog(project):
 
     readme_path = project["readme_path"]
     if not readme_path.exists():
-        print(f"Error: README not found at {readme_path}")
+        print(f"Skipped: README not found at {readme_path}")
         return
 
     with open(readme_path, 'r', encoding='utf-8') as f:
         readme_content = f.read()
 
-    # Extract everything from '## Changelog' to the end of the file
     changelog_match = re.search(r"(## Changelog\n.*)", readme_content, re.DOTALL)
     if not changelog_match:
         print(f"Error: Could not find '## Changelog' section in {readme_path.name}")
@@ -207,8 +204,6 @@ def update_changelog(project):
     with open(changelog_lua_path, 'r', encoding='utf-8') as f:
         original_lua_content = f.read()
 
-    # Replace only the contents of `local changelogText = [[ ... ]]`,
-    # leaving the rest of the file (e.g. the Settings:AddPage code) intact.
     changelog_var_pattern = re.compile(
         r"(local\s+changelogText\s*=\s*\[\[\n?)(.*?)(\]\])",
         re.DOTALL
@@ -224,8 +219,6 @@ def update_changelog(project):
         count=1
     )
 
-    # Clean up any stray `<Name>_Changelog = [=[ ... ]=]` blocks left behind
-    # by older/buggy runs of this script.
     stray_var_pattern = re.compile(
         rf"\n*{re.escape(name)}_Changelog\s*=\s*\[=\[.*?\]=\]\n*", re.DOTALL
     )
@@ -244,7 +237,6 @@ def enforce_lua_headers(project):
     addon_dir = project["addon_dir"]
     print(f"\n--- [{name}] Enforcing Lua Headers ---")
 
-    # Optional metadata lines, only emitted when the project defines them
     metadata_lines = ["    Author:  Prephmage / Prephalia"]
     if project.get("curseforge_url"):
         metadata_lines.append(f"    CurseForge: {project['curseforge_url']}")
@@ -252,7 +244,6 @@ def enforce_lua_headers(project):
         metadata_lines.append(f"    GitHub: {project['github_url']}")
     metadata_block = "\n".join(metadata_lines)
 
-    # Doubled braces are literal; {rel_path} is filled in per file below
     NEW_HEADER_TEMPLATE = (
         "--[[\n"
         "    <{rel_path}>\n"
@@ -273,7 +264,6 @@ def enforce_lua_headers(project):
     )
 
     for dirpath, dirnames, filenames in os.walk(addon_dir):
-        # Ignore the 'libs' and 'Libs' folders
         if 'libs' in dirnames:
             dirnames.remove('libs')
         if 'Libs' in dirnames:
@@ -284,7 +274,6 @@ def enforce_lua_headers(project):
                 file_path = os.path.join(dirpath, filename)
                 file_rel = os.path.relpath(file_path, addon_dir)
 
-                # Format for the addon root structure (<folder>\...)
                 formatted_rel_path = os.path.join(folder, file_rel).replace("/", "\\")
 
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -317,7 +306,7 @@ def update_readme_toc(project):
     readme_path = project["readme_path"]
 
     if not readme_path.exists():
-        print(f"Error: README not found at {readme_path}")
+        print(f"Skipped: README not found at {readme_path}")
         return
 
     with open(readme_path, 'r', encoding='utf-8') as f:
@@ -350,22 +339,32 @@ def update_readme_toc(project):
 
 
 def package_addon(project, root_dir, packaged_dir):
-    """Packages the project folder into a zip file inside the .packaged directory."""
+    """Packages the main project folder and any extra bundled folders into a zip archive."""
     name = project["name"]
     print(f"\n--- [{name}] Packaging Addon ---")
+
+    if not project["version_string"]:
+        print("Skipped: No version specified for standalone packaging.")
+        return
+
     packaged_dir.mkdir(parents=True, exist_ok=True)
 
-    zip_filename = packaged_dir / f"{name}_v{project['version_string']}"
+    zip_path = packaged_dir / f"{name}_v{project['version_string']}.zip"
+    folders_to_pack = [project["addon_dir"]] + project.get("also_bundle", [])
 
-    # shutil.make_archive adds the .zip extension automatically
-    shutil.make_archive(
-        base_name=str(zip_filename),
-        format='zip',
-        root_dir=project["addon_dir"].parent,
-        base_dir=project["addon_dir"].name
-    )
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for folder_path in folders_to_pack:
+            if not folder_path.exists():
+                print(f"Warning: Folder to bundle not found at {folder_path}")
+                continue
 
-    print(f"Success: Packaged addon to {zip_filename}.zip")
+            for dirpath, _, filenames in os.walk(folder_path):
+                for filename in filenames:
+                    abs_file = Path(dirpath) / filename
+                    rel_arcname = abs_file.relative_to(folder_path.parent)
+                    zf.write(abs_file, arcname=str(rel_arcname))
+
+    print(f"Success: Packaged addon to {zip_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -373,7 +372,8 @@ def package_addon(project, root_dir, packaged_dir):
 # ---------------------------------------------------------------------------
 
 def process_project(project, wow_addon_dirs, root_dir, packaged_dir):
-    print(f"\n{'=' * 60}\nProject: {project['name']} (v{project['version_string']})\n{'=' * 60}")
+    v_str = f" (v{project['version_string']})" if project['version_string'] else ""
+    print(f"\n{'=' * 60}\nProject: {project['name']}{v_str}\n{'=' * 60}")
 
     if not project["addon_dir"].exists():
         print(f"Error: Project folder not found at {project['addon_dir']}")
@@ -401,7 +401,6 @@ def main():
         print("Error: No projects defined under 'projects' in globalvars.preph")
         return 1
 
-    # Optional: `python process.py PrephUI OtherAddon` to run only specific projects
     requested = sys.argv[1:]
     if requested:
         known = {p["name"].lower(): p for p in projects}

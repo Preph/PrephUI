@@ -13,12 +13,13 @@
             "github_url": "https://github.com/preph/PrephUI",
             "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
             "readme": "PrephUI\\README.md",
-            "changelog": "PrephUI\\Modules\\General\\ChangelogSettings.lua",
+            "changelog": "PrephUISettings\\Modules\\General\\Changelog.lua",
             "version": {
                 "major": 0,
-                "minor": 1,
-                "patch": 15
-            }
+                "minor": 2,
+                "patch": 0
+            },
+            "alsoBundleThese": ["PrephUISettings"]
         },
         {
             "name": "PrephDamageMeter",
@@ -31,9 +32,15 @@
             "version": {
                 "major": 0,
                 "minor": 0,
-                "patch": 1
+                "patch": 2
             }
+        },
+        {
+            "name": "PrephUISettings",
+            "folder": "PrephUISettings",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
         }
     ]
-
 }
