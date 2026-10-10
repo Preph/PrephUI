@@ -8,18 +8,32 @@
     "projects": [
         {
             "name": "PrephUI",
-            "folder": "PrephUI",
+            "folder": "PrephUI/PrephUI",
             "author": "Julian Stiebler",
             "github_url": "https://github.com/preph/PrephUI",
             "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
             "readme": "PrephUI\\README.md",
-            "changelog": "PrephUISettings\\Modules\\General\\Changelog.lua",
+            "changelog": "PrephUI\\PrephUISettings\\General\\Changelog.lua",
             "version": {
                 "major": 0,
                 "minor": 2,
-                "patch": 0
+                "patch": 2
             },
-            "alsoBundleThese": ["PrephUISettings"]
+            "alsoBundleThese": [
+                "PrephUI/PrephUIActionbars", 
+                "PrephUI/PrephUIBags",
+                "PrephUI/PrephUIChat",
+                "PrephUI/PrephUIClassbars", 
+                "PrephUI/PrephUIDatabars", 
+                "PrephUI/PrephUIMaps", 
+                "PrephUI/PrephUINameplates",
+                "PrephUI/PrephUIQoL", 
+                "PrephUI/PrephUIRaidtools",
+                "PrephUI/PrephUISettings", 
+                "PrephUI/PrephUISkins", 
+                "PrephUI/PrephUITooltips",
+                "PrephUI/PrephUIUnitframes"
+            ]
         },
         {
             "name": "PrephDamageMeter",
@@ -27,17 +41,101 @@
             "author": "Julian Stiebler",
             "github_url": "https://github.com/preph/PrephDamageMeter",
             "curseforge_url": "https://www.curseforge.com/wow/addons/PrephDamageMeter",
-            "readme": "PrephDamageMeter\\README.md",
-            "changelog": "PrephDamageMeter\\Changelog.lua",
+            "readme": "PrephUI\\PrephDamageMeter\\README.md",
+            "changelog": "PrephUI\\PrephDamageMeter\\Changelog.lua",
             "version": {
                 "major": 0,
                 "minor": 0,
-                "patch": 2
+                "patch": 4
             }
         },
         {
+            "name": "PrephUIActionbars",
+            "folder": "PrephUI/PrephUIActionbars",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIBags",
+            "folder": "PrephUI/PrephUIBags",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIChat",
+            "folder": "PrephUI/PrephUIChat",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIClassbars",
+            "folder": "PrephUI/PrephUIClassbars",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIDatabars",
+            "folder": "PrephUI/PrephUIDatabars",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIMaps",
+            "folder": "PrephUI/PrephUIMaps",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUINameplates",
+            "folder": "PrephUI/PrephUINameplates",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIQoL",
+            "folder": "PrephUI/PrephUIQoL",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIRaidTools",
+            "folder": "PrephUI/PrephUIRaidTools",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
             "name": "PrephUISettings",
-            "folder": "PrephUISettings",
+            "folder": "PrephUI/PrephUISettings",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUISkins",
+            "folder": "PrephUI/PrephUISkins",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUITooltips",
+            "folder": "PrephUI/PrephUITooltips",
+            "author": "Julian Stiebler",
+            "github_url": "https://github.com/preph/PrephUI",
+            "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"
+        },
+        {
+            "name": "PrephUIUnitframes",
+            "folder": "PrephUI/PrephUIUnitframes",
             "author": "Julian Stiebler",
             "github_url": "https://github.com/preph/PrephUI",
             "curseforge_url": "https://www.curseforge.com/wow/addons/prephui"

@@ -87,7 +87,11 @@ def generate_folder_junction(wow_addon_dir_str, project):
         print(f"Error: WoW Addon directory not found at {wow_addon_dir}")
         return
 
-    dest_path = wow_addon_dir / project["folder"]
+    # The junction must sit directly inside AddOns, named after the addon folder only.
+    # "folder" can be nested in the repo (e.g. "PrephUI/PrephUISettings"); using it as-is
+    # would point mklink at AddOns\PrephUI\PrephUISettings, whose parent does not exist.
+    dest_name = Path(project["folder"].replace("\\", "/")).name
+    dest_path = wow_addon_dir / dest_name
 
     if dest_path.exists():
         print(f"Skipped: Destination already exists at {dest_path}")
@@ -95,6 +99,10 @@ def generate_folder_junction(wow_addon_dir_str, project):
 
     safe_dest = os.path.normpath(str(dest_path))
     safe_source = os.path.normpath(str(project["addon_dir"]))
+
+    if not Path(safe_source).exists():
+        print(f"Error: Junction source not found at {safe_source}")
+        return
 
     command = f'mklink /J "{safe_dest}" "{safe_source}"'
 
@@ -143,7 +151,19 @@ def update_toc_version(project):
 
 
 def markdown_changelog_to_addon_format(changelog_md):
-    """Converts raw '## Changelog' markdown section from README into colored Lua changelog format."""
+    """Converts the raw '## Changelog' section of the README into the addon changelog text.
+
+    The README markup is passed through untouched; the in-game renderer (Changelog.lua)
+    interprets it. Supported line syntax (indentation defines nesting):
+
+        +Title            collapsible group (children are indented below it)
+        - text            list entry, deeper `-` lines are sub entries
+        Title             plain line = header
+        *text*            big text (whole line)
+        `text` / ``text`` inline code tag
+        -text-            strikethrough (whole line or inline)
+        |+added|-removed  diff block, any number of |+ / |- parts
+    """
     body = re.sub(r"^##\s*Changelog\s*\n+", "", changelog_md.strip(), count=1)
 
     pieces = re.split(r"^###\s+(.+?)\s*$", body, flags=re.MULTILINE)
@@ -160,12 +180,9 @@ def markdown_changelog_to_addon_format(changelog_md):
         for line in section_body.split("\n"):
             if not line.strip():
                 continue
-            bullet_match = re.match(r"^(\s*)-\s?(.*)$", line)
-            if bullet_match:
-                indent, text = bullet_match.groups()
-                rendered_lines.append(f"{indent}\u2022 {text}".rstrip())
-            else:
-                rendered_lines.append(line.rstrip())
+            line = line.replace("\t", "    ").rstrip()
+            # "]]" would terminate the Lua long string
+            rendered_lines.append(line.replace("]]", "] ]"))
         rendered_versions.append("\n".join(rendered_lines))
 
     divider = "\n\n|TInterface\\Common\\UI-TooltipDivider:5:400:0:0|t\n\n"
