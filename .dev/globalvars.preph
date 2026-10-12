@@ -12,12 +12,12 @@
             "author": "Julian Stiebler",
             "github_url": "https://github.com/preph/PrephUI",
             "curseforge_url": "https://www.curseforge.com/wow/addons/prephui",
-            "readme": "PrephUI\\README.md",
+            "readme": "README.md",
             "changelog": "PrephUI\\PrephUISettings\\General\\Changelog.lua",
             "version": {
                 "major": 0,
                 "minor": 2,
-                "patch": 2
+                "patch": 3
             },
             "alsoBundleThese": [
                 "PrephUI/PrephUIActionbars", 
