@@ -1,4 +1,5 @@
-UI replacement for classic/classic+
+Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub-1.5MB suite delivers everything you love about modern UI overhauls without the overhead. Featuring ultra-responsive, high-performance nameplates, hyper-optimized modules, and insane granular customization—right down to your group leader crown placement. Handcrafted for players who demand perfection and peak framerates.
+
 <!-- START DEFINITION TOC -->
 # Table of Contents
 
@@ -27,12 +28,33 @@ UI replacement for classic/classic+
 
 ## Changelog
 
+## Pending fixes
+
+Actionbar
+  - When a new staance is learned, make sure we only grow to the right without moving the dummy mover, just extend it by 1 button to the right only when growdirection is right. Same for left, then left.
+
+Unitframe Settings
+  - Aura watch rpeview is still scuffed
+
+Unitframe
+  - performance in raids is still scuffed
+
 ### V0.2.3
 
-+ Unitframes
-  - Portrait settings overhauled
-  - Added portrait to groups
-  - Added portrait settings: 3D Scale, Zoom & Reset Animation Timer
+*New Unitframe System*
+
++ Editmode
+  - Fixed scuffed WIDTH match
+  - Fixed a bug where anchoring at and for detached Powerbar/Castbars was not working as intended
+
++ Settings
+  - Reworked settings  a bit to support drag-n-drop resorting and ordered highlighted entries for our widget editors
+
++ Borders
+  - Added proper borders to every element
+
++ 
+
 
 ### V0.2.2
 
