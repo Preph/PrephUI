@@ -30,31 +30,42 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 ## Pending fixes
 
-Actionbar
-  - When a new staance is learned, make sure we only grow to the right without moving the dummy mover, just extend it by 1 button to the right only when growdirection is right. Same for left, then left.
++ Blizzard Editmode Cross-Compability
+  - Fix BagBar positioning
+  - Add proper right-click settings that display editmode settings, for all OEM movers except actionbars
 
-Unitframe Settings
-  - Aura watch rpeview is still scuffed
-
-Unitframe
-  - performance in raids is still scuffed
++ Classbars
+  - Dynamic coloring of wanted power thresholds
 
 ### V0.2.3
 
 *New Unitframe System*
 
++ Unitframe System
+  - Now widget based
+
++ Settings
+  - Reworked settings a bit to support drag-n-drop resorting and ordered highlighted entries for our widget editors
+  - Quick access buttons for `Collapse All` `Uncollapse All`
+  - Added Movers to the quick settings
+
++ Profiles
+  - Properly using built-in EncodingUtils to decode/encode strings
+  - Improved paste behaviour for the Import profile box
+
++ Nameplates
+  - Now also using the new drag-n-drop and ordered elements for widget
+
 + Editmode
   - Fixed scuffed WIDTH match
   - Fixed a bug where anchoring at and for detached Powerbar/Castbars was not working as intended
-
-+ Settings
-  - Reworked settings  a bit to support drag-n-drop resorting and ordered highlighted entries for our widget editors
+  - Fixed elements growing when a drag-n-drop was in progress
 
 + Borders
-  - Added proper borders to every element
+  - Added proper borders to every element now
 
-+ 
-
++ Actionbars
+  - Fixed stance bar incorrectly growing
 
 ### V0.2.2
 
@@ -83,27 +94,6 @@ Unitframe
 + Settings
   - Added background textures
   - Added a small blue indent indicator to collapsible elements for more clarity
-
-+ Pending Features / Bugfixes
-  - UnlockUI-Mode
-    - Allow anchoring of DataBars to to the DamageMeter
-
-  - Blizzard Editmode Cross-Compability
-    - Fix BagBar positioning
-    - Add proper right-click settings that display editmode settings, for all OEM movers except actionbars
-
-  - Classbars
-    - Dynamic coloring of wanted power thresholds
-
-  - Unitframes
-    - Dynamic Texts for Frames including [LEVEL]
-    - Boss Frames
-  
-  - Dynamic Texts
-    - Corrctly respond to `[foreName]` and `[surName]` tags and also rename them to `firstName` and `SecondName`
-
-  - Settings
-    - Quick access buttons for `Collapse All` `Uncollapse All`
 
 ### V0.2.1
 
