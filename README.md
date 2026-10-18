@@ -31,19 +31,19 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 ## Pending fixes
 
-+ Blizzard Editmode Cross-Compability
-  - Fix BagBar positioning
-
-+ Classbars
-  - Dynamic coloring of wanted power thresholds
-  - Give shadowpriest proper shadow priest color
-
 + Databars
   - reword Elements to Widgets
+  - Attached databars to the damage meter do not delete properly
 
 + Unitframes
-  - Make the class player preview for overlays etc not druid, then screenshot
-    - Added pet frame to be togglebale for others from the group, or a shared container also for raid
+  - Added pet frame to be togglebale for others from the group, or a shared container also for raid
+
++ Nameplates 
+  - Double names on friendly players
+  - FontFamily russian china
+
++ Classbars
+  - Background issue
 
 ### V0.2.5
 
