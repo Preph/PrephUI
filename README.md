@@ -31,20 +31,6 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 ## Pending fixes
 
-+ Databars
-  - reword Elements to Widgets
-  - Attached databars to the damage meter do not delete properly
-
-+ Unitframes
-  - Added pet frame to be togglebale for others from the group, or a shared container also for raid
-
-+ Nameplates 
-  - Double names on friendly players
-  - FontFamily russian china
-
-+ Classbars
-  - Background issue
-
 ### V0.2.5
 
 *Polishes*
