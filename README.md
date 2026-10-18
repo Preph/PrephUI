@@ -5,6 +5,7 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 - [What it offers](#what-it-offers)
 - [Changelog](#changelog)
+  - [V0.2.4](#v024)
   - [V0.2.3](#v023)
   - [V0.2.2](#v022)
   - [V0.2.1](#v021)
@@ -32,10 +33,28 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 + Blizzard Editmode Cross-Compability
   - Fix BagBar positioning
-  - Add proper right-click settings that display editmode settings, for all OEM movers except actionbars
 
 + Classbars
   - Dynamic coloring of wanted power thresholds
+  - Give shadowpriest proper shadow priest color
+
++ Databars
+  - reword Elements to Widgets
+
++ Unitframes
+  - Make the class player preview for overlays etc not druid, then screenshot
+
+
+
+### V0.2.4
+
+*EditMode Rework*
+
++ EditMode
+  - Added proper right-click quick panels for all native supported Blizzard Frames
+
++ Bars
+  - Added reputation bar
 
 ### V0.2.3
 

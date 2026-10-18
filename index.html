@@ -1,1160 +1,1181 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrephUI - Modern WoW Interface</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PrephUI - a lean, modern World of Warcraft interface built on Blizzard's own secure templates. Unit frames, nameplates, action bars, chat and more.">
+<title>PrephUI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+/* The page is a replica of the in-game settings window (PrephUISettings library):
+   flat fills, square corners, 1px borders, collapsible sidebar, search, collapsible sections.
+   Every color is a theme key (same keys as the library). Colors are set from JS as "r g b" triples. */
+:root{
+ --accent:255 123 0;--bg:10 10 10;--bg-a:.97;--titlebar:27 27 27;--panel:29 29 29;--field:10 10 10;
+ --button:51 51 51;--border:56 56 56;--text:255 255 255;--dim:153 153 153;--value:255 217 179;--danger:204 77 77;
+ --btn-h:74 74 74;--btn-d:36 36 36;--acc-n:191 92 0;--acc-p:127 61 0;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;font:13px/1.55 Inter,sans-serif;background:rgb(var(--bg));color:rgb(var(--text));overflow:hidden;text-shadow:1px 1px 0 #000}
+i,input,.pv-b img{text-shadow:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+code{color:rgb(var(--value));background:rgb(var(--field));border:1px solid rgb(var(--border));padding:0 5px;font-size:.88em}
+em{font-style:normal;color:rgb(var(--accent))}
+strong{color:rgb(var(--value));font-weight:600}
+.chev{display:inline-block;flex:none;width:14px;height:14px;background:#ccc;
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='5.25,10.5 8.75,7 5.25,3.5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/14px 14px no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='5.25,10.5 8.75,7 5.25,3.5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/14px 14px no-repeat}
+.chev.dn,.col.open>.col-h .chev{
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='3.5,5.25 7,8.75 10.5,5.25' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='3.5,5.25 7,8.75 10.5,5.25' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E")}
+.grow{flex:1}
+.nav,.scroller,.menu-l,.ptabs{scrollbar-width:thin;scrollbar-color:rgb(89 89 89) rgb(var(--field))}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:rgb(var(--field))}::-webkit-scrollbar-thumb{background:rgb(89 89 89)}::-webkit-scrollbar-thumb:hover{background:rgb(var(--accent))}
 
-    <style>
-        :root {
-            --brand-orange: #ff7b00;
-            --brand-orange-hover: #e66e00;
-            --bg-dark: #0d0d0d;
-            --bg-surface: #1a1a1a;
-            --text-muted: #a0a0a0;
-        }
+/* ---------- window ---------- */
+.win{position:fixed;inset:0;display:flex;flex-direction:column;background:rgb(var(--bg));overflow:hidden}
+.win::after{content:"";position:absolute;inset:0;border:1px solid #000;pointer-events:none;z-index:500}
+.tb{flex:none;height:26px;display:flex;align-items:center;gap:10px;background:rgb(var(--titlebar));padding-left:10px;position:relative;z-index:35}
+.tb-title{font-size:12px}
+.ptabs{display:flex;height:100%;margin-left:8px;overflow-x:auto}
+.ptab{border:0;background:transparent;color:rgb(var(--dim));padding:0 14px;height:100%;cursor:pointer;font-size:12px;white-space:nowrap;position:relative}
+.ptab i{margin-right:7px;color:rgb(var(--accent))}
+.ptab:hover{background:rgb(255 255 255/.06);color:#fff}
+.ptab.on{color:#fff}.ptab.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:rgb(var(--accent))}
+.tbtn{display:inline-flex;align-items:center;gap:7px;height:100%;padding:0 12px;border:0;background:transparent;color:rgb(var(--dim));font-size:12px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{background:rgb(255 255 255/.06);color:#fff}.tbtn i{color:rgb(var(--accent))}
+.tlinks{display:flex;height:100%}
+.tlinks a{display:flex;align-items:center;justify-content:center;width:30px;color:#a6a6a6;font-size:14px}
+.tlinks a:hover{background:rgb(255 255 255/.07);color:rgb(var(--accent))}
+.burger{display:none;width:26px;height:26px;border:0;background:transparent;cursor:pointer;color:#ccc;margin-left:-10px}
+.body{flex:1;min-height:0;display:flex;position:relative}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            overflow-x: hidden;
-            position: relative;
-        }
+/* ---------- sidebar ---------- */
+.side{flex:none;width:214px;display:flex;flex-direction:column;background:rgb(var(--panel));border-right:1px solid rgb(var(--border));z-index:30}
+.search{position:relative;margin:10px 10px 10px}
+.search input{width:100%;height:26px;padding:0 24px 0 8px;background:rgb(var(--field));border:1px solid rgb(var(--border));border-radius:0;color:#fff;font:11px Inter,sans-serif;outline:0}
+.search input:focus{border-color:rgb(var(--accent))}
+.search input::placeholder{color:rgb(var(--dim))}
+.clr{position:absolute;right:3px;top:4px;width:18px;height:18px;border:0;background:transparent;color:rgb(166 166 166);cursor:pointer;font-size:10px;padding:0}
+.clr:hover{color:rgb(var(--danger));background:rgb(255 255 255/.07)}
+.nav{flex:1;min-height:0;overflow-y:auto;padding:0 4px 4px 6px}
+.ng{height:28px;padding:0 0 4px 10px;display:flex;align-items:flex-end;font-size:10px;color:rgb(var(--dim))}
+.nr{position:relative;height:26px;display:flex;align-items:center;cursor:pointer;font-size:12px;color:rgb(255 255 255/.78);user-select:none}
+.nr:hover{background:rgb(255 255 255/.05)}
+.nr.on{color:#fff;background:rgb(var(--accent)/.16)}
+.nr.on::before{content:"";position:absolute;left:-6px;top:0;bottom:0;width:3px;background:rgb(var(--accent))}
+.nchev{width:18px;height:26px;display:flex;align-items:center;justify-content:center;flex:none}
+.nchev .chev{margin:0;background:#b3b3b3}.nchev.none{visibility:hidden}
+.nt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc{font-size:10px;color:rgb(var(--dim));padding:0 8px 0 4px}
+.side-bar{flex:none;border-top:1px solid rgb(var(--border));padding:10px;display:flex;flex-direction:column;gap:6px}
+.foot{text-align:center;font-size:10px;color:rgb(var(--dim));margin-top:2px}
 
-        /* Ambient Background Effects */
-        .ambient-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: -1;
-            overflow: hidden;
-        }
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:24px;padding:0 12px;border:1px solid #000;border-radius:0;background:rgb(var(--button));color:#fff;font-size:11px;cursor:pointer;white-space:nowrap;transition:background .1s}
+.btn:hover{background:rgb(var(--btn-h))}.btn:active{background:rgb(var(--btn-d))}
+.btn.acc{background:rgb(var(--acc-n))}.btn.acc:hover{background:rgb(var(--accent))}.btn.acc:active{background:rgb(var(--acc-p))}
+.btn.ghost{background:transparent;border-color:rgb(var(--border));height:20px}
+.btn.ghost:active{background:rgb(255 255 255/.03)}
+.btn.ghost:hover{background:rgb(255 255 255/.08);border-color:rgb(var(--accent))}
+.btn i{font-size:11px;width:14px;text-align:center}
 
-        #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-        }
+/* ---------- content ---------- */
+.main{flex:1;min-width:0;position:relative}
+.scroller{position:absolute;inset:14px 10px 12px 16px;overflow-y:auto;padding:0 12px 14px 0}
+.page,.res{max-width:1280px;margin:0 auto;padding-right:6px}
+.ph{display:flex;align-items:center;gap:6px;min-height:28px;border-bottom:1px solid rgb(var(--border));margin-bottom:10px}
+.ph h1{margin:0;flex:1;font-size:16px;font-weight:400;color:rgb(var(--accent));line-height:28px}
+.para{margin:0 0 10px;color:rgb(var(--dim));font-size:11px;line-height:1.45}
+.sx{position:relative}
+.flash{position:absolute;inset:-4px -6px;pointer-events:none;background:rgb(var(--accent));opacity:0;animation:fl 1.8s ease-out;z-index:6}
+@keyframes fl{0%{opacity:.4}15%{opacity:.18}30%{opacity:.4}55%{opacity:.12}100%{opacity:0}}
 
-        .glowing-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 20s infinite ease-in-out alternate;
-            opacity: 0.5;
-            z-index: -1;
-        }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 123, 0, 0.08) 0%, rgba(0,0,0,0) 60%);
-            top: -10%;
-            left: -10%;
-        }
-
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 123, 0, 0.06) 0%, rgba(0,0,0,0) 60%);
-            bottom: 5%;
-            right: -5%;
-            animation-delay: -5s;
-        }
-
-        .orb-3 {
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(255, 123, 0, 0.04) 0%, rgba(0,0,0,0) 60%);
-            top: 30%;
-            left: 40%;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(50px, 80px) scale(1.1); }
-            100% { transform: translate(-30px, 40px) scale(0.9); }
-        }
-
-        /* Custom Orange Accents */
-        .text-orange { color: var(--brand-orange) !important; }
-        .bg-orange { background-color: var(--brand-orange) !important; }
-        
-        .btn-orange {
-            background-color: var(--brand-orange);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-orange:hover {
-            background-color: var(--brand-orange-hover);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
-        }
-
-        .btn-outline-orange {
-            border: 2px solid var(--brand-orange);
-            color: var(--brand-orange);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline-orange:hover {
-            background-color: var(--brand-orange);
-            color: #fff;
-        }
-
-        /* Nav */
-        .navbar {
-            background-color: rgba(13, 13, 13, 0.85) !important;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 123, 0, 0.2);
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(180deg, rgba(26,26,26,0.6) 0%, rgba(13,13,13,1) 100%);
-            padding: 140px 0 60px;
-            position: relative;
-        }
-
-        .hero-showcase {
-            margin-top: -40px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Images & Media */
-        .showcase-img {
-            border-radius: 12px;
-            border: 1px solid #333;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-            position: relative;
-            z-index: 1;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        border-color 0.4s ease, 
-                        box-shadow 0.4s ease, 
-                        z-index 0s;
-        }
-
-        .showcase-img:hover {
-            transform: scale(1.25);
-            z-index: 1000;
-            border-color: var(--brand-orange);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 123, 0, 0.4);
-        }
-
-        .row, .container {
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Layout Utilities */
-        .bg-surface { background-color: rgba(26, 26, 26, 0.6); backdrop-filter: blur(5px); }
-        .border-orange { border-color: var(--brand-orange) !important; }
-        
-        /* Cards */
-        .feature-card {
-            background-color: rgba(13, 13, 13, 0.8);
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 25px;
-            height: 100%;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        .feature-card:hover { 
-            border-color: var(--brand-orange); 
-            transform: translateY(-5px);
-        }
-        .feature-icon { font-size: 2rem; color: var(--brand-orange); margin-bottom: 15px; }
-
-        /* Damage Meter style switcher */
-        .damage-style-switcher {
-            display: inline-flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            padding: 6px;
-            border: 1px solid rgba(255, 123, 0, 0.28);
-            border-radius: 10px;
-            background: rgba(13, 13, 13, 0.72);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.28);
-        }
-
-        .damage-style-btn {
-            border: 1px solid transparent;
-            border-radius: 7px;
-            background: transparent;
-            color: #a0a0a0;
-            padding: 9px 18px;
-            font: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .damage-style-btn:hover {
-            color: #fff;
-            border-color: rgba(255, 123, 0, 0.45);
-            background: rgba(255, 123, 0, 0.08);
-        }
-
-        .damage-style-btn.active {
-            color: #fff;
-            background: var(--brand-orange);
-            border-color: var(--brand-orange);
-            box-shadow: 0 4px 14px rgba(255, 123, 0, 0.24);
-        }
-
-        .damage-hero-showcase {
-            margin-top: 8px;
-        }
-
-        .damage-hero-image {
-            opacity: 1;
-            transition: opacity 0.18s ease, transform 0.3s ease;
-        }
-
-        .damage-hero-image.is-switching {
-            opacity: 0.15;
-            transform: scale(0.992);
-        }
-
-        .damage-style-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 12px;
-        }
+/* collapsible - the in-game look: chevron + semi-bold title, 1px line, content flush left, no box */
+.col{margin-bottom:10px}
+.col-h{display:flex;align-items:center;width:100%;height:24px;padding:0 0 0 4px;border:0;border-bottom:1px solid rgb(var(--border));background:transparent;text-align:left;cursor:pointer;font-size:12px;font-weight:400;color:#fff}
+.col-h:hover{background:rgb(255 255 255/.05)}
+.col-h .chev{margin:0 6px 0 0}
+.col-b{display:none;position:relative;padding:10px 0 4px 20px}
+.col.open>.col-b{display:block}
+/* guide line: 1px accent at 35%, 11px from the left (centred under the chevron), stops 4px above the bottom; nested levels stack */
+.col-b::before{content:"";position:absolute;left:11px;top:0;bottom:4px;width:1px;background:rgb(var(--accent)/.35)}
+.col-b>*:last-child{margin-bottom:0}
+.col-b .col{margin-bottom:8px}
+.col-b .para{margin:0}
 
 
-        /* Product switcher */
-        .product-tabs {
-            position: fixed;
-            top: 62px;
-            left: 0;
-            right: 0;
-            z-index: 1030;
-            display: flex;
-            justify-content: center;
-            padding: 10px 16px;
-            background: linear-gradient(180deg, rgba(13,13,13,0.96), rgba(13,13,13,0.78));
-            border-bottom: 1px solid rgba(255, 123, 0, 0.18);
-            backdrop-filter: blur(14px);
-        }
+/* preview panel (like the in-game "... PREVIEW" box) */
+.pv{background:rgb(var(--panel));border:1px solid rgb(var(--border));margin-bottom:10px}
+.pv.sticky{position:sticky;top:-6px;z-index:8;box-shadow:0 8px 14px -6px rgba(0,0,0,.7)}
+.pv-h{display:flex;align-items:center;gap:10px;padding:5px 6px 5px 10px;border-bottom:1px solid rgb(var(--border))}
+.pv-t{font-size:10px;letter-spacing:.4px;color:rgb(var(--dim));white-space:nowrap}
+.pv-x{margin-left:auto;width:22px;height:22px;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pv-x:hover{background:rgb(255 255 255/.07)}.pv-x .chev{margin:0;background:#ccc}
+.pv:not(.shut) .pv-x .chev{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='3.5,5.25 7,8.75 10.5,5.25' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpolyline points='3.5,5.25 7,8.75 10.5,5.25' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E")}.pv.shut .pv-b{display:none}.pv.shut .pv-h{border-bottom:0}
+.seg{display:flex;gap:2px;margin-left:auto;overflow-x:auto;min-width:0}
+.seg+.pv-x{margin-left:0}
+.seg button{flex:none;height:20px;padding:0 11px;border:1px solid #000;background:rgb(var(--button));color:#bfbfbf;font-size:11px;cursor:pointer;border-radius:0}
+.seg button:hover{background:rgb(var(--btn-h))}
+.seg button.on{background:rgb(var(--accent));color:#fff}
+.pv-b{padding:8px;background:rgb(var(--field)/.55);text-align:center}
+.pv-b figure{margin:0}
+.pv-b img{display:inline-block;max-width:100%;max-height:min(46vh,520px);border:1px solid #000;outline:1px solid rgb(var(--border));cursor:zoom-in;background:rgb(var(--field))}
+.pv-b img:hover{outline-color:rgb(var(--accent))}
+.pv.sticky .pv-b img{max-height:min(30vh,340px)}
+.pv-b figcaption{margin-top:6px;font-size:11px;color:rgb(var(--dim))}
+.pv-b .badimg{display:none;padding:26px 10px;color:rgb(var(--dim));font-size:12px}
+.pv-b figure.bad img,.pv-b figure.bad figcaption{display:none}.pv-b figure.bad .badimg{display:block}
 
-        .product-tabs-inner {
-            display: inline-flex;
-            gap: 4px;
-            padding: 4px;
-            border: 1px solid #333;
-            border-radius: 999px;
-            background: rgba(26,26,26,0.78);
-            box-shadow: 0 8px 28px rgba(0,0,0,0.35);
-        }
+/* rows */
+.prow{display:flex;gap:10px;align-items:flex-start;padding:5px 0;color:rgb(var(--dim));font-size:11px}
+.prow>i{color:rgb(var(--accent));width:16px;text-align:center;margin-top:4px;font-size:11px;flex:none}
+.prow+.prow{border-top:1px solid rgb(var(--border)/.5)}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px}
 
-        .product-tab {
-            border: 1px solid transparent;
-            border-radius: 999px;
-            padding: 9px 18px;
-            background: transparent;
-            color: #a0a0a0;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
+/* tables */
+.filter{width:100%;height:24px;margin-bottom:8px;padding:0 8px;background:rgb(var(--field));border:1px solid rgb(var(--border));color:#fff;font:12px Inter,sans-serif;outline:0;border-radius:0}
+.filter:focus{border-color:rgb(var(--accent))}.filter::placeholder{color:rgb(var(--dim))}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:rgb(var(--field)/.6);border:1px solid rgb(var(--border))}
+th{text-align:left;padding:6px 12px;background:rgb(var(--titlebar));color:rgb(var(--accent));font-size:11.5px;font-weight:600;border-bottom:1px solid rgb(var(--border))}
+td{padding:6px 12px;border-bottom:1px solid rgb(var(--border)/.55);font-size:12px;color:rgb(var(--dim));vertical-align:top}
+td:first-child{color:#fff;white-space:nowrap}
+tr:last-child td{border-bottom:0}tbody tr:hover td{background:rgb(255 255 255/.04)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.gal figure{margin:0}.gal img{width:100%;display:block;border:1px solid #000;outline:1px solid rgb(var(--border));cursor:zoom-in;background:rgb(var(--field))}
+.gal img:hover{outline-color:rgb(var(--accent))}
+.gal figcaption{margin-top:5px;font-size:11px;color:rgb(var(--dim));text-align:center}
+.gal figure.bad{display:none}
 
-        .product-tab:hover {
-            color: #fff;
-            border-color: rgba(255,123,0,0.35);
-        }
+/* home */
+.hero{padding:22px 0 18px;text-align:center}
+.badge{display:inline-block;margin:0 3px 14px;padding:3px 11px;border:1px solid rgb(var(--border));background:rgb(var(--panel));font-size:11.5px}
+.h1{font-size:clamp(1.9rem,4.4vw,2.9rem);font-weight:800;line-height:1.12;margin:0 0 14px}
+.lead{max-width:760px;margin:0 auto;color:rgb(var(--dim));font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.card{display:flex;gap:11px;text-align:left;padding:10px 12px;background:rgb(var(--field)/.6);border:1px solid rgb(var(--border));cursor:pointer;border-radius:0}
+.card:hover{border-color:rgb(var(--accent));background:rgb(var(--accent)/.1)}
+.card>i{color:rgb(var(--accent));font-size:16px;width:22px;text-align:center;margin-top:2px}
+.card b{display:block;font-size:12.5px;font-weight:600}.card span{display:block;color:rgb(var(--dim));font-size:11.5px;line-height:1.4;margin-top:2px}
+.cta-p{max-width:620px;margin:0 0 12px;color:rgb(var(--dim))}
 
-        .product-tab.active {
-            color: #fff;
-            background: var(--brand-orange);
-            box-shadow: 0 5px 18px rgba(255,123,0,0.25);
-        }
+/* search results */
+.rt{height:28px;line-height:28px;font-size:13px;color:rgb(var(--accent));margin-bottom:6px}
+.rt b{color:#fff;font-weight:600}
+.rr{position:relative;display:block;width:100%;text-align:left;height:42px;padding:8px 10px;margin-bottom:4px;background:rgb(var(--panel));border:1px solid rgb(var(--border));cursor:pointer;border-radius:0}
+.rr:hover{background:rgb(38 38 38);border-color:rgb(var(--accent))}
+.rr .k{position:absolute;right:10px;top:8px;font-size:10px;color:rgb(var(--dim))}
+.rr .l{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:90px}
+.rr .s{display:block;font-size:10px;color:rgb(var(--dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+mark{background:none;color:rgb(var(--accent))}
 
-        .product-page {
-            min-height: 100vh;
-        }
+/* popup menu (theme picker) */
+.menu{position:fixed;z-index:200;background:rgb(var(--bg)/var(--bg-a));border:1px solid #000}
+.menu-s{display:block;width:calc(100% - 4px);margin:2px;height:22px;padding:0 8px;background:rgb(var(--field));border:1px solid rgb(var(--border));color:#fff;font:11px Inter,sans-serif;outline:0;border-radius:0}
+.menu-s:focus{border-color:rgb(var(--accent))}
+.menu-l{max-height:248px;overflow-y:auto;padding:2px}
+.menu-l::-webkit-scrollbar{width:4px}.menu-l::-webkit-scrollbar-track{background:transparent}.menu-l::-webkit-scrollbar-thumb{background:rgb(115 115 115)}
+.mr{position:relative;display:flex;align-items:center;width:100%;height:20px;padding:0 8px 0 18px;border:0;background:transparent;text-align:left;font-size:11px;cursor:pointer;white-space:nowrap}
+.mr:hover{background:rgb(255 255 255/.12)}
+.mr.on::before{content:"";position:absolute;left:6px;top:7px;width:6px;height:6px;background:rgb(var(--accent))}
+.mr.hd{color:#8c8c8c;cursor:default;pointer-events:none}
+.mr .sw{width:10px;height:10px;margin-right:7px;border:1px solid #000;flex:none}
+.menu-e{padding:6px 10px;color:rgb(var(--dim));font-size:11px}
 
-        .product-page[hidden] {
-            display: none !important;
-        }
+/* lightbox */
+#lb{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;cursor:zoom-out;padding:20px}
+#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border:1px solid #000;outline:1px solid rgb(var(--border))}
+:focus-visible{outline:1px solid rgb(var(--accent));outline-offset:1px}
+.scrim{display:none}
 
-        .damage-hero {
-            padding: 175px 0 70px;
-            background:
-                radial-gradient(circle at 50% 15%, rgba(255,123,0,0.12), transparent 38%),
-                linear-gradient(180deg, rgba(26,26,26,0.72) 0%, rgba(13,13,13,1) 100%);
-        }
-
-        .compat-badge {
-            border: 1px solid rgba(255,123,0,0.45);
-            background: rgba(255,123,0,0.08);
-            color: #fff;
-            border-radius: 999px;
-            padding: 7px 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .damage-feature-card {
-            background: rgba(13,13,13,0.82);
-            border: 1px solid #333;
-            border-radius: 14px;
-            padding: 28px;
-            height: 100%;
-            backdrop-filter: blur(10px);
-            transition: border-color 0.3s ease, transform 0.3s ease;
-        }
-
-        .damage-feature-card:hover {
-            border-color: var(--brand-orange);
-            transform: translateY(-4px);
-        }
-
-        .damage-showcase {
-            max-height: 430px;
-            object-fit: contain;
-            background: #080808;
-        }
-
-        /* Raid frame overlay examples with labels */
-        .overlay-example {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-
-        .overlay-example:last-child {
-            margin-bottom: 0;
-        }
-
-        .overlay-example-label {
-            min-width: 150px;
-            text-align: right;
-            color: #ffffff;
-            font-size: 0.9rem;
-            font-weight: 600;
-            line-height: 1.2;
-        }
-
-        .overlay-example-image {
-            flex: 0 1 250px;
-            max-width: 250px;
-        }
-
-        @media (max-width: 575.98px) {
-            .overlay-example {
-                gap: 10px;
-            }
-
-            .overlay-example-label {
-                min-width: 105px;
-                font-size: 0.78rem;
-            }
-
-            .overlay-example-image {
-                max-width: 190px;
-            }
-        }
-
-        .style-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: rgba(26,26,26,0.72);
-            color: #ddd;
-            font-size: 0.85rem;
-        }
-
-        @media (max-width: 767.98px) {
-            .product-tabs {
-                top: 56px;
-                padding: 8px 10px;
-            }
-            .product-tab {
-                padding: 8px 12px;
-                font-size: 0.8rem;
-            }
-            .damage-hero {
-                padding-top: 155px;
-            }
-        }
-
-
-        .dm-facts { list-style: none; padding: 0; margin: 0; }
-        .dm-facts li { padding: 9px 0; border-bottom: 1px solid #262626; color: var(--text-muted); font-size: 0.95rem; }
-        .dm-facts li:last-child { border-bottom: 0; }
-        .dm-facts strong { color: #fff; font-weight: 600; }
-        .dm-cmd { width: 100%; border-collapse: collapse; }
-        .dm-cmd td { padding: 9px 12px; border-bottom: 1px solid #262626; font-size: 0.92rem; vertical-align: top; }
-        .dm-cmd td:first-child { white-space: nowrap; color: var(--brand-orange); font-family: ui-monospace, Consolas, monospace; }
-        .dm-cmd td:last-child { color: var(--text-muted); }
-    </style>
+@media(max-height:620px){.pv.sticky{position:static}}
+@media(max-width:860px){
+ .burger{display:block}.tlinks,.tb-title{display:none}.tb{padding-left:10px}
+ .side{position:absolute;top:0;bottom:0;left:0;transform:translateX(-102%);transition:transform .16s;box-shadow:6px 0 20px rgba(0,0,0,.6)}
+ .win.nav-open .side{transform:none}
+ .win.nav-open .scrim{display:block;position:absolute;inset:26px 0 0 0;z-index:25;background:rgba(0,0,0,.5)}
+ .scroller{inset:10px}
+ .pv.sticky{position:static}
+ .tbtn span{display:none}
+}
+</style>
 </head>
 <body>
+<div class="win" id="win">
+  <div class="tb">
+    <button class="burger" id="burger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    <span class="tb-title" id="brand"></span>
+    <div class="ptabs" id="tabs"></div>
+    <span class="grow"></span>
+    <button class="tbtn" id="themeBtn" title="Skin the window"><i class="fa-solid fa-brush"></i><span id="themeName"></span></button>
+    <span class="tlinks" id="links"></span>
+  </div>
+  <div class="body">
+    <aside class="side" id="side">
+      <div class="search"><input id="q" type="text" placeholder="Search settings..." autocomplete="off" spellcheck="false" aria-label="Search settings"><button class="clr" id="qclr" hidden aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button></div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-bar" id="sbar"></div>
+    </aside>
+    <main class="main"><div class="scroller" id="sc"><div id="pages"></div><div class="res" id="res" hidden></div></div></main>
+    <div class="scrim" id="scrim"></div>
+  </div>
+</div>
+<div id="lb"><img alt=""></div>
 
-    <!-- Product switcher -->
-    <div class="product-tabs" aria-label="Preph products">
-        <div class="product-tabs-inner" role="tablist">
-            <button class="product-tab active" id="prephui-tab" type="button" role="tab" aria-selected="true" aria-controls="prephui-page" data-product="prephui">
-                <i class="fa-solid fa-shield-halved me-2"></i>PrephUI
-            </button>
-            <button class="product-tab" id="damage-tab" type="button" role="tab" aria-selected="false" aria-controls="damage-page" data-product="damage">
-                <i class="fa-solid fa-chart-simple me-2"></i>Damage Meter
-            </button>
-        </div>
-    </div>
+<script>
+/* =====================================================================
+   EDIT HERE. All site text lives in SITE. The renderer further down needs no changes.
 
+   - base        Image root. Image paths below are relative to it. A full https:// URL also works.
+   - icon        Any Font Awesome 6 solid icon name, e.g. 'fa-users'
+   - Text fields accept HTML (<code>, <strong>, <em> for the accent color).
+   - Every category becomes a page in the sidebar. A category that has tables, `perf` notes or
+     more than one screenshot gets sub pages (Performance, the tables, Screenshots) that fold
+     under it. Everything is searchable.
+   - To add a screenshot:  add  ['ui/yourfile.png', 'Caption']  to a category's `shots`.
+     The first screenshot is shown in the preview box, the others become buttons above it.
+   - To add a table row:   add  ['Cell 1', 'Cell 2']  to a table's `rows`.
+   - To add a feature:     add  ['fa-icon', 'Title', 'Text']  to `features`.
+     Optional 4th entry: a screenshot path. Opening that feature switches the preview to it.
+   - To add a performance note: add a string to a category's `perf` list.
+   - To add a category:    copy a whole { id: ... } block inside `categories`, then list its id in NAV.
+   ===================================================================== */
+const SITE = {
+  base: 'https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/',
+  brand: 'PrephUI',
+  links: [
+    ['fa-brands fa-github', 'https://github.com/Preph/PrephUI'],
+    ['fa-solid fa-puzzle-piece', 'https://www.curseforge.com/wow/addons/prephui'],
+    ['fa-brands fa-discord', 'https://discord.gg/2Ey3zd4qg']
+  ],
+  footer: '&copy; Prephalia 2026',
 
-    <!-- Ambient Background Animation with Particles -->
-    <div class="ambient-background">
-        <canvas id="particleCanvas"></canvas>
-        <div class="glowing-orb orb-1"></div>
-        <div class="glowing-orb orb-2"></div>
-        <div class="glowing-orb orb-3"></div>
-    </div>
+  products: {
+    /* ============================ PREPHUI ============================ */
+    prephui: {
+      tab: 'PrephUI', icon: 'fa-solid fa-shield-halved', hash: '',
+      title: 'PrephUI - Modern WoW Interface',
+      hero: {
+        badges: ['Built for Midnight (12.x)', 'Secret value safe in combat'],
+        h1: 'Enhance Without <em>Bloat</em>',
+        lead: `PrephUI is a complete World of Warcraft interface for Midnight: unit frames, nameplates, action bars, chat, class resource bars, data bars and a set of quality of life features, all set up from one settings window. It builds on Blizzard's own secure templates instead of replacing them, so it stays fast and feels like the default UI grown up. Midnight hides combat data from addons behind secret values, and PrephUI is written around that from the ground up. It never compares or calculates with a secret value, so your frames, bars, cooldowns and chat keep updating in combat, including Mythic+ and other restricted content.`,
+        shots: [['', 'ui/overview.png']]
+      },
+      about: {
+        title: 'Why <em>PrephUI</em>',
+        text: [
+          `The default UI already does a lot well. PrephUI lets the game's built-in systems do the heavy lifting and adds what is missing: layouts you control, better performance, and automation for the things you click through every day.`,
+          `That keeps it small. There is little to load, little to break, and nothing to relearn. Switch on only the modules you want, and the rest cost you nothing.`
+        ],
+        points: [
+          ['fa-user-shield', `<strong>Secret safe.</strong> In Midnight, health, power, auras, cooldowns and chat text can arrive as secret values in combat. PrephUI passes them straight to native bars, aura containers and text, and never branches on them, so nothing goes blank or throws errors mid-fight.`],
+          ['fa-bolt', `Native secure templates and the game's modern built-in systems do the work, so it stays fast in a 40-player raid.`],
+          ['fa-check', `Very few external libraries, so there is less to load and less to break.`],
+          ['fa-puzzle-piece', `Every module loads on demand and is switched on from one settings window. Open it with <code>/pui</code>.`],
+          ['fa-file-export', `Everything is stored in your profile, so it exports, imports and switches as one.`]
+        ],
+        shot: 'ui/editmode.png'
+      },
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-shield-halved text-orange me-2"></i>PrephUI</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#philosophy">Philosophy</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item ms-lg-3">
-                        <a class="btn btn-outline-orange btn-sm mt-1" href="https://github.com/Preph/PrephUI" target="_blank">
-                            <i class="fa-brands fa-github me-1"></i> View Source
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+      categories: [
+        { id: 'unitframes', icon: 'fa-users', title: 'Unit Frames',
+          tag: `Player, target, party and raid frames made from widgets you pick.`,
+          intro: `Frames for Player, Target, Target of Target, Focus, Pet, Party, Raid (all 8 subgroups) and Main Tanks (up to four rows: tank, their target, their target's target). Each frame type keeps its own ordered widget list. Name, health text, power, castbar, icons and auras are all widgets that you add, remove, anchor and style yourself. The defaults are only a starting point, and anything you remove stays removed. In the settings window every widget has its own page, with drag and drop ordering plus Add, Copy, Remove and Reset.`,
+          features: [
+            ['fa-puzzle-piece', 'Widgets', `Anchor a widget to the frame, the health bar or another widget, then nudge it into place. Text widgets can be added more than once, so you can have two names or three health texts.`],
+            ['fa-heart', 'Health bar and color', `Class, reaction or custom color. Horizontal or vertical fill, reverse fill and a custom texture. Offline, ghost and dead states recolor the bar. You also get a hover highlight, a target border and a threat border with adjustable color and thickness, and an optional frame border and background.`],
+            ['fa-droplet', 'Overlays on the bar', `Absorb shields (an overshield wraps back into the bar), incoming heals, heals that will be eaten, and max health reduction, where the bar rescales to your real maximum. Each one can be toggled and colored per frame type, and the overlay textures can be swapped globally.`],
+            ['fa-hand-sparkles', 'Dispel highlights', `A native highlight colored per type: Magic, Curse, Disease, Poison, Enrage and Bleed. Show every type, or only the dispels you know.`],
+            ['fa-eye', 'AuraWatch', `Track defensives, active mitigation, raid cooldowns, externals, healing buffs and more on each frame. Pick a corner per category and add your own spells. An aura you mark as important is highlighted when it is missing.`],
+            ['fa-people-group', 'Group and raid', `Sort by role, choose the grow direction, spacing and units per column. The range fader uses your own in-range and out-of-range alpha, set per frame type. Blizzard's party and raid frames are hidden for you.`],
+            ['fa-up-down-left-right', 'Edit Mode', `Every frame has an Edit Mode mover. The Target frame can mirror the Player frame's geometry, and detached power bars and castbars have their own movers.`]
+          ],
+          perf: [
+            `Event bursts are coalesced. However many <code>UNIT_HEALTH</code> events land in a window, each widget updates at most once per pass, up to 10 passes a second.`,
+            `Each event is registered once for the whole addon, not once per frame, and only while a widget needs it. Forty raid frames do not mean forty callbacks.`,
+            `Widgets you remove register no events and run no code. Overlays you turn off cost nothing. Alpha, text and icon state are only rewritten when the value changed.`,
+            `No unit frame uses a per-frame <code>OnUpdate</code>. The few timers are shared and switch themselves off when there is nothing to do, and castbar fill is driven natively by the client.`,
+            `Hot paths allocate nothing, so you do not get garbage collection hitches in the middle of a pull. Every update runs isolated, so one bad or suddenly forbidden frame cannot break the rest.`
+          ],
+          tables: [{ title: 'All widgets', head: ['Widget', 'What it does'], rows: [
+            ['Name', `Class, reaction or custom color, max width, realm names and [Dead] and [Offline] tags`],
+            ['Health text', `Up to four values from Current, Max, Percent, Deficit, Absorb, Heal absorb and Incoming, with your own separator and K/M/B abbreviation`],
+            ['Power', `Docked, floating or fully detached. Shows the mana cost of your current cast`],
+            ['Castbar', `Cast, channel and empower. Attached or detached, with channel ticks and a latency safe zone`],
+            ['Buffs / Debuffs', `Native aura containers with size, spacing, growth direction and row wrapping`],
+            ['Portrait', `2D, 3D or class icon, docked left or right`],
+            ['Level', `Difficulty colors, optional hide at max level`],
+            ['Role', `Tank, healer or damager icon`],
+            ['Raid marker', `Raid target markers`],
+            ['Leader / Assist', `Crown and assist icons`],
+            ['Assignment', `Main Tank, Main Assist and Master Looter`],
+            ['Resurrection / Summon', `Incoming resurrection and summon status icons`],
+            ['Ready check', `Ready check status`],
+            ['Combat / Resting', `In combat and resting status icons`],
+            ['PvP', `PvP flag icon with a flag timer`],
+            ['Pet happiness', `Where the client supports it`]
+          ] }],
+          shots: [['ui/raidframe.png', 'Group'], ['ui/overlays/dispells.png', 'Dispel'], ['ui/overlays/absorb.png', 'Absorb'], ['ui/overlays/healabsorb.png', 'Heal absorb'], ['ui/overlays/maxhealthreduce.png', 'Max health reduction']] },
 
-    <main id="prephui-page" class="product-page" role="tabpanel" aria-labelledby="prephui-tab">
-    <!-- Hero Section -->
-    <section class="hero-section text-center border-bottom border-orange">
-        <div class="container">
-            <h1 class="display-3 fw-bold mb-4">Enhance Without <span class="text-orange">Bloat</span></h1>
-            <p class="lead mb-5 mx-auto" style="max-width: 800px; color: var(--text-muted);">
-                WoW already ships with a lot of good stuff. It mostly needs a few nudges in the right direction. PrephUI builds on Blizzard's own secure templates and lets the built-in systems do the heavy lifting, so you get better performance, the quality-of-life touches you'll actually use, and a UI that looks the way it should.
-            </p>
-            
-            <div class="hero-showcase px-3">
-                <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overview.png" alt="PrephUI Full Overview" class="img-fluid showcase-img w-100" style="max-width: 1000px;">
-            </div>
-        </div>
-    </section>
+        { id: 'nameplates', icon: 'fa-id-badge', title: 'Nameplates',
+          tag: `Threat colors, quest progress, aura rows and a castbar, laid out your way.`,
+          intro: `Blizzard's plate is hidden and replaced. The plate keeps one ordered widget list with name, level, buffs and debuffs, raid marker, threat, quest objectives and a power bar. Add or delete widgets, anchor them to the health bar, the castbar or another widget, and nudge them into place. You can add several of the same type, for example one aura row for your debuffs and another for crowd control. The Level and Quest widgets switch themselves off in Mythic+ keystones to save space and CPU.`,
+          features: [
+            ['fa-heart', 'Health bar and color', `Reaction colors, optional class colors for players, a hover highlight and pixel-perfect borders that do not flicker as plates move. Health text is built from tokens: <code>[curhp]</code>, <code>[maxhp]</code>, <code>[curhp%]</code>, <code>[curpp]</code>, <code>[maxpp]</code>, <code>[curpp%]</code>, <code>[name]</code> and <code>[level]</code>. Large numbers are shortened (<code>4k</code>, <code>4 Mil</code>), including secret values.`],
+            ['fa-bullseye', 'Threat, target and focus', `High, medium and low threat colors are applied before anything else. The plate changes color when the mob is on another tank (assigned role or Main Tank), classified mobs get a lieutenant tint, and tap-denied mobs are greyed out unless you have threat on them. Target glow comes in several styles, and focus plates get their own color and an optional overlay texture.`],
+            ['fa-list-check', 'Quest objectives', `Shows <code>!</code> and your progress (<code>3/8</code>) on mobs you need for a quest. The value is read from the unit tooltip. When the tooltip is restricted in combat, the last known value is used. Friendly quest givers are not tracked.`],
+            ['fa-shield', 'Absorbs', `Shields on NPC plates are drawn as a striped bar from the end of the health bar, so overshields stay visible.`],
+            ['fa-wand-sparkles', 'Castbar', `Spell icon and name, the cast target (class-colored for players), an interrupt flash with adjustable timing, and your own colors and height.`],
+            ['fa-layer-group', 'Stacking and size', `Set how much plates overlap horizontally and vertically. Blizzard's distance scaling and fade are turned off, so your fixed plate size is not fought.`],
+          ],
+          perf: [
+            `Event driven. Plates are pooled and reused instead of rebuilt.`,
+            `Frames are only created when a plate needs them, and updates skip native calls when nothing changed.`,
+            `Level and Quest widgets switch off in Mythic+ keystones, where space and CPU matter most.`,
+            `Aura rows are native containers, so addon code never reads the auras.`
+          ],
+          tables: [{ title: 'All widgets', head: ['Widget', 'What it does'], rows: [
+            ['Name', `Alignment follows the anchor you pick`],
+            ['Level', `Small boxed level badge`],
+            ['Buffs / Debuffs', `Native aura containers with limit, size, spacing and growth direction. Filter by your own, crowd control, dispellable or purgeable, and exclude spell IDs`],
+            ['Raid marker', `Any size, any anchor`],
+            ['Threat', `Threat as a percentage to pull aggro, or the raw value, colored by threat state`],
+            ['Quest objectives', `Shows ! and your progress on mobs you need for a quest`],
+            ['Power bar', `Optional resource bar`]
+          ] }],
+          shots: [['ui/nameplate.png', 'Quest progress and health text on a plate']] },
 
-    <!-- Philosophy & Edit Mode -->
-    <section id="philosophy" class="py-5 bg-surface mt-5">
-        <div class="container py-5">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold mb-3">Our <span class="text-orange">Philosophy</span></h2>
-                    <p class="fs-5" style="color: var(--text-muted);">
-                        PrephUI takes its cues from the big all-in-one interface replacements and the clever little addons, then goes one step further: lean on what the game already does well, and spend more effort on quality of life than on repainting every single frame.
-                    </p>
-                    <p style="color: var(--text-muted);">
-                        We didn't want to rebuild the whole UI from scratch and drag a pile of heavy libraries along with it, so PrephUI stays slim on purpose. By building on native Blizzard code and secure templates, it ends up clean, fast and genuinely useful, and it feels like the default game grown up a little rather than a replacement you have to relearn.
-                    </p>
-                    <ul class="list-unstyled mt-4">
-                        <li class="mb-2"><i class="fa-solid fa-check text-orange me-2"></i> Very few external libraries, so there's less to load and less to break.</li>
-                        <li class="mb-2"><i class="fa-solid fa-bolt text-orange me-2"></i> Built on native secure templates and the game's modern built-in systems.</li>
-                        <li><i class="fa-solid fa-sliders text-orange me-2"></i> Quality of life goes beyond the interface, too. There's even an Auto-Inviter with temporary keywords, for example.</li>
-                    </ul>
-                </div>
-                <div class="col-lg-6 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/editmode.png" alt="Edit Mode" class="img-fluid showcase-img w-100">
-                </div>
-            </div>
-        </div>
-    </section>
+        { id: 'actionbars', icon: 'fa-table-cells', title: 'Action Bars',
+          tag: `Eight bars, a stance bar and a pet bar on a grid you control.`,
+          intro: `Your eight action bars, the stance bar and the pet bar are rebuilt on a clean grid. Each bar is its own block: turn it on or off, choose how many buttons it has and how many fit in a row, pick which way it grows, then anchor it to the screen or to another bar. The defaults give you two wide bars at the bottom, two side blocks and a stance bar, and you can change all of them. Disabled bars stay hidden and cost nothing.`,
+          features: [
+            ['fa-arrows-up-down-left-right', 'Any shape', `Grow right, left, up or down, so a bar can be a row, a column or a block. A bar anchored to another bar follows it, so moving Bar 1 moves everything built around it.`],
+            ['fa-circle', 'Button style', `Square or circular buttons with your own size, spacing and buttons per row. Icon zoom is shared by every bar. Add an optional border (size and color per bar, class color supported) and an optional empty slot grid. Keybind and macro text sizes are adjustable, and you can hide macro names.`],
+            ['fa-keyboard', 'Short keybinds', `Modifiers and keys are shortened (<code>s-</code>, <code>a-</code>, <code>c-</code>, <code>M3</code>, <code>MWU</code>, <code>NP1</code> and so on), in English and German. Keybinds on empty buttons are hidden unless the grid is on.`],
+            ['fa-stopwatch', 'Cooldowns', `Icons desaturate while a real cooldown is running, per bar. The global cooldown never greys anything out, and anything left desaturated after a fight is cleaned up when you leave combat. Cooldown numbers use Blizzard's native countdown, so they work in combat. Pick <code>1:30</code>, abbreviated or flat truncated minutes, plus your own font and size.`],
+            ['fa-wand-magic-sparkles', 'Aura glows', `Pick a spell and the slot lights up when that aura is on you, with a looping pulse and no polling. Add as many spells to a slot as you like and change the glow style in one place. Blizzard's aura containers draw the glow, so addon code never reads the aura and it keeps working in restricted content.`],
+            ['fa-eye-slash', 'Blizzard art and Edit Mode', `You can hide the default main bar art, the status tracking bars, the micro button bar and other Blizzard bar chrome. Every bar has an Edit Mode mover and a right-click quick panel. Position, rows, icon count, icon size and padding are pushed into Blizzard's own Edit Mode layout, so your bars and the native ones agree on where things are. Native icon size moves in 10% steps, so the native bar is rounded down and always fits inside yours. 45 px counts as 100% native size on every bar.`],
+            ['fa-lock', 'In combat, vehicles and pet battles', `Layout changes can't be applied in combat. They are queued and applied when you leave it. Bars hide themselves in pet battles, in vehicles and while an override bar is up.`]
+          ],
+          perf: [
+            `Event driven, with no per-frame polling. Events only touch the buttons they could affect, not all 150 of them.`,
+            `Cooldowns are handled by one central pass instead of a handler per button.`,
+            `Button styling is cached with a signature, so an identical restyle is skipped.`,
+            `Stance and pet layouts only rebuild when something changed. In combat the work waits until you leave it.`
+          ],
+          tables: [{ title: 'Bars', head: ['Bar', 'What it is'], rows: [
+            ['Action Bars 1 to 8', `The main bar, both bottom bars, both right bars and Bars 6 to 8. Up to 12 buttons each`],
+            ['Stance bar', `Sizes itself to the forms you actually have, so it never shows empty buttons`],
+            ['Pet bar', `Ten buttons, anchored to your pet frame by default`]
+          ] }],
+          shots: [['ui/actionbars.png', 'Three bars with keybinds, timers and glows'], ['ui/proccs.png', 'Proc overlays']] },
 
-    <!-- Core Visual Features -->
-    <section id="features" class="py-5">
-        <div class="container py-5">
-            <div class="text-center mb-5 pb-3">
-                <h2 class="fw-bold">Visual <span class="text-orange">Fidelity</span></h2>
-                <p class="text-muted">Sharp, readable tools for the fights where every second counts.</p>
-            </div>
-            
-            <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
-                <div class="col-lg-5 order-2 order-lg-1 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/actionbars.png" alt="Actionbars" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/proccs.png" alt="Proc Overlays" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/classbar.png" alt="Classbars" class="img-fluid showcase-img w-100 mb-4">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/nameplate.png" alt="Nameplates" class="img-fluid showcase-img w-100">
-                </div>
-                <div class="col-lg-7 order-1 order-lg-2 ps-lg-5">
-                    <h3 class="fw-bold mb-3">Combat <span class="text-orange">Clarity</span></h3>
-                    <p class="text-muted mb-4">Keep your eyes on the fight. Action bars, nameplates and class mechanics are all built to give you what you need to know without cluttering your screen.</p>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-stopwatch feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Action Bars with Buff and Debuff Timers</h5>
-                            <p class="text-muted small">Clean, crisp action bars with easy-to-read buff and debuff timers sitting right on your abilities, so you never have to hunt for them elsewhere on the screen.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-wand-magic-sparkles feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Proc Overlays & Glows</h5>
-                            <p class="text-muted small">The familiar SpellActivationOverlay textures for the procs that matter, like a Mage's Hot Streak or Arcane Missiles, so you notice them the moment they happen.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-layer-group feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Integrated Classbars</h5>
-                            <p class="text-muted small">Sleek built-in class bars that track a range of class mechanics, with no heavy standalone addon or WeakAura needed.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="me-3"><i class="fa-solid fa-id-badge feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Dynamic Nameplates</h5>
-                            <p class="text-muted small">Clean, modern nameplates that show threat, debuffs, buffs, interrupts, mouseover and focus at a glance. Quest objectives show up right on the plate too.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        { id: 'classbars', icon: 'fa-layer-group', title: 'Classbars',
+          tag: `Combo points, holy power, runes, shards and more as one strip of segments.`,
+          intro: `Combo points, holy power, runes, soul shards, chi, essence, arcane charges, insanity and maelstrom are drawn as evenly spaced segments on a single bar. Each class has a small definition file that lists its resources. The bar reads it, hides what your spec does not use, and follows spec, talent and form changes on its own. Switch spec or shift into cat form and the bar updates. If your class has nothing to show right now, the bar hides itself. Classbars are for secondary resources. Mana, rage, energy and other primary power belong on your player frame, so they are left out.`,
+          features: [
+            ['fa-palette', 'Look', `Set width, height and spacing, fill opacity and background opacity. Use class color or your own color for each resource, and choose per resource whether it shows a number. Every segment can have a border with its own thickness and color (class color supported). The border is drawn in front of the fill, so a full segment never hides its edge. Runes that are still recharging use their own dim opacity.`],
+            ['fa-anchor', 'Layout', `By default the bar sits on top of your player castbar. Anchor it to any frame you like, or drag it with its Edit Mode mover. Classes that have more than one resource at once stack them in rows, with the same spacing as the segments.`],
+            ['fa-bolt', 'Buff driven resources', `Some resources are really buffs, like Maelstrom Weapon on clients where it is a five stack. In restricted content the bar hands those to Blizzard's native aura containers, so the segments keep filling in combat without addon code reading the aura. On clients where Maelstrom Weapon is a spell, the Shaman bar only shows once you know it.`],
+            ['fa-code', 'Easy to extend', `A class file only lists the resources, their segment count and an optional color. <code>/pui dump talents</code> prints your learned talents with their spell IDs, which is handy when you write one.`]
+          ],
+          perf: [
+            `Event driven. Power events only wake the bar when the power type is one it shows.`,
+            `Updates are batched into one pass per frame.`,
+            `Layout and values are separate, so an event that only changes a number never rebuilds the segments.`,
+            `Class definitions refresh on spec, talent and form changes, not on every power tick.`,
+            `Nothing is registered for resources your class does not have. Aura scanning is off on retail and only runs for buff based resources on clients that need it.`
+          ],
+          tables: [{ title: 'What each class shows', head: ['Class', 'Resource'], rows: [
+            ['Death Knight', `Runes, with recharging runes dimmed`],
+            ['Druid', `Combo points in cat form`],
+            ['Evoker', `Essence`],
+            ['Mage', `Arcane charges`],
+            ['Monk', `Chi`],
+            ['Paladin', `Holy power`],
+            ['Priest', `Insanity for Shadow`],
+            ['Rogue', `Combo points`],
+            ['Shaman', `Maelstrom for Elemental and Enhancement, including the buff driven Maelstrom Weapon on WoW Forever`],
+            ['Warlock', `Soul shards`],
+            ['Demon Hunter, Hunter, Warrior', `Nothing. Fury, Pain, Focus and Rage are primary power`]
+          ] }],
+          shots: [['ui/classbar.png', 'Classbar on the castbar']] },
 
-            <div class="row align-items-center g-5 mb-5 pb-4">
-                <div class="col-lg-7 pe-lg-5">
-                    <h3 class="fw-bold mb-3">Group <span class="text-orange">Awareness</span></h3>
-                    <p class="text-muted mb-4">Modernized unit frames built to help you make quick decisions in group content.</p>
-                    
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-users feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Advanced Raid Frames</h5>
-                            <p class="text-muted small">Highly configurable frames with clear summon icons, PvP and role indicators, and deficit health tracking. Shields, absorbs, max health reductions and other important mechanics all show up right on the frame. A customizable <strong>AuraWatch</strong> lets you keep tabs on active buffs or your own HoTs, so you can tell at a glance who still needs healing.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-ruler-combined feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Dynamic Range Faders</h5>
-                            <p class="text-muted small">Frames for group members who wander out of range or line of sight fade out gently, so your attention stays on the people you can actually reach.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-hand-sparkles feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Customizable Dispel Overlays</h5>
-                            <p class="text-muted small">Highlight every dispellable debuff, or only the types your class can actually cure, using distinct striped textures and colors you can change to suit your taste.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <div class="me-3"><i class="fa-solid fa-hand-sparkles feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Native & Extra Overlays</h5>
-                            <p class="text-muted small">Absorbs, heal absorbs and max health reductions are highlighted as well, so a health bar tells you its whole story at a glance.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="me-3"><i class="fa-solid fa-user-shield feature-icon fs-3"></i></div>
-                        <div>
-                            <h5 class="mb-1">Classic Unit Frames, Perfected</h5>
-                            <p class="text-muted small">The classic layout, brought up to date with crisp health bars, clean typography and precise scaling, so it stays easy to read in the middle of a fight.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 position-relative">
-                    <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/raidframe.png"
-                        alt="Raid Frames"
-                        class="img-fluid showcase-img w-100 mb-4">
+        { id: 'chat', icon: 'fa-message', title: 'Chat',
+          tag: `A cleaner chat panel with short channel names, class colors and saved history.`,
+          intro: `Blizzard's chat chrome is replaced with a clean panel, a slim button gutter and a matching editbox. The chat window, the gutter and the editbox row are one block. You move and resize that block in Edit Mode (its mover is called Chat Window), and the position and size are written into Blizzard's own layout too, so the two never fight over where the chat lives. The window accepts 250 to 800 wide and 120 to 800 tall.`,
+          features: [
+            ['fa-palette', 'Look', `Background color, opacity and an on / off toggle. A border with thickness and color (class color supported), shared with the rest of PrephUI. Tabs follow the panel, and the selected tab is the bright one. Pick your chat font and size from your shared media fonts. Blizzard's textures, edge art and scrollbar are hidden. With Apply to Blizzard on in the general font settings, your font also reaches Blizzard panels, including the Guild & Communities chat.`],
+            ['fa-keyboard', 'Editbox', `Put it below or above the chat. If one of your Data Bars is anchored to the chat, the editbox slides into that bar's row, and the chat, the bar and the editbox share one exact width with no gap. When the editbox closes, the bar comes back. While you type, the editbox is raised above the bar with a fully opaque background so nothing bleeds through.`],
+            ['fa-table-columns', 'Button gutter', `A column on the left of the chat with Copy, Friends, Up, Down, Bottom, Channel and Emote buttons. Blizzard's own arrows are gone and the channel and emote menus are restyled to match. The mouse wheel scrolls the chat too, and Shift jumps to the top or bottom. Voice, text to speech and Quick Join buttons are hidden.`],
+            ['fa-hashtag', 'Short channel names', `<code>[1. General]</code> becomes <code>[1]</code>, so more of the actual message fits on a line. Guild, Officer, Party, Raid, Raid Warning and Instance become one or two letters, and so do says, yells and whispers. Joined, Left and Changed Channel notices keep the full name.`],
+            ['fa-user-tag', 'Class colored names', `Names in a message are colored by class when they are in your group, raid or guild. Click one to whisper them. Emotes are left alone.`],
+            ['fa-link', 'Clickable links', `Web addresses become links. Click one and it lands in your editbox, selected and ready to copy.`],
+            ['fa-clock', 'Timestamps', `<code>HH:MM</code>, <code>HH:MM:SS</code> or <code>MM:SS</code> in a quiet grey. They use Blizzard's own timestamp setting, so turning them off here turns them off everywhere.`],
+            ['fa-inbox', 'Whispers tab', `Optionally move every whisper, Battle.net included, into its own Whispers tab. Turning it on sets whispers to open inline and creates a Whispers window if you do not have one.`],
+            ['fa-clock-rotate-left', 'History', `The last 500 messages of your main chat are saved and put back after a reload, a relog or a zone change, in order and only once, even if Blizzard rebuilds your chat windows several times in a row. History belongs to the account, not the character, and only the main chat window is saved.`],
+            ['fa-copy', 'Copy chat', `Opens a window with your recent chat, with colors and one timestamp kept. Links and icons are cleaned out, so what you copy is plain, readable text. Drag it anywhere, and Esc closes it.`]
+          ],
+          perf: [
+            `Event driven. Group and guild colors refresh on roster events, and the guild scan runs at most once a minute.`,
+            `Messages that do not need touching pass through after a few cheap checks instead of a pile of pattern scans.`,
+            `Secret values are never read, changed or saved. Chat text is only colored, shortened or linked when it is safe to, and anything the client marks as secret is shown exactly as it arrived.`,
+            `Channel shortening is skipped in Mythic+ keystones, where chat text is often secret.`
+          ],
+          tables: [{ title: 'Short channel names', head: ['Channel', 'Shown as'], rows: [
+            ['General and numbered channels', `<code>[1]</code>`],
+            ['Guild, Officer', `<code>[G]</code>, <code>[O]</code>`],
+            ['Party, Raid, Raid Warning, Instance', `<code>[P]</code>, <code>[R]</code>, <code>[RW]</code>, <code>[I]</code>`],
+            ['Say, Yell, Whisper', `<code>[S]</code>, <code>[Y]</code>, <code>[W]</code>`],
+            ['Battle.net whisper', `<code>[BW]</code>`]
+          ] }],
+          shots: [['ui/chat.png', 'Chat panel with button gutter']] },
 
-                    <div class="overlay-example">
-                        <div class="overlay-example-label">Dispel</div>
-                        <div class="overlay-example-image">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/dispells.png"
-                                alt="Dispell"
-                                class="img-fluid showcase-img w-100">
-                        </div>
-                    </div>
+        { id: 'databars', icon: 'fa-chart-bar', title: 'Data Bars',
+          tag: `Gold, FPS, latency, clock, guild and more in bars you place yourself.`,
+          intro: `Add as many bars as you like, put any of the 14 modules on them and give each bar its own settings page. The modules are System, Clock, Zone, Layer, Durability, Guild, Friends, Talents, Reload, Bags, Gold, FPS, Latency and PrephsUI. Hover a module to get a tooltip with more detail. A bar can also be anchored to your chat, where the editbox merges into its row.`,
+          features: [
+            ['fa-plug', 'Mix and match', `Put any modules on any number of bars and style each bar on its own page.`],
+            ['fa-computer-mouse', 'Detail on hover', `Most modules have a tooltip, from raid resets to addon CPU time. The module table lists what each one shows.`],
+            ['fa-link', 'Next to your chat', `Anchor a bar to your chat and the two share one exact width with the editbox.`]
+          ],
+          perf: [
+            `Each module updates on its own events instead of one shared polling loop.`,
+            `The FPS tooltip shows a live addon memory and CPU breakdown, so you can see what costs what.`
+          ],
+          tables: [{ title: 'All modules', head: ['Module', 'What it shows'], rows: [
+            ['System', `Quick access for everyday utility and a system overview`],
+            ['Clock', `Hover for account-wide raid IDs plus weekly and 3-day reset countdowns`],
+            ['Zone', `Your current zone`],
+            ['Layer', `The layer you are on, worked out from NPC GUIDs`],
+            ['Durability', `Hover for the exact condition and percentage of every equipped slot`],
+            ['Guild', `Hover for levels, names and AFK/DND tags. Hold <code>Shift</code> for zones, notes and officer notes`],
+            ['Friends', `Character level, Battle.net / RealID status and friends on your server`],
+            ['Talents', `Quick access to your talents`],
+            ['Reload', `One click UI reload`],
+            ['Bags', `Bag space at a glance`],
+            ['Gold', `Total gold across the whole account, with a breakdown by faction and character`],
+            ['FPS', `Hover for a live breakdown of addon memory usage and CPU time`],
+            ['Latency', `Home and world latency`],
+            ['PrephsUI', `UI resets, profile management and a status overview`]
+          ] }],
+          shots: [['ui/databar.png', 'Databar with guild, FPS, zone, clock, gold and more']] },
 
-                    <div class="overlay-example">
-                        <div class="overlay-example-label">Absorb</div>
-                        <div class="overlay-example-image">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/absorb.png"
-                                alt="Absorb"
-                                class="img-fluid showcase-img w-100">
-                        </div>
-                    </div>
+        { id: 'skins', icon: 'fa-window-restore', title: 'Skins & Edit Mode',
+          tag: `Move Blizzard's own frames from PrephUI and keep them in your profile.`,
+          intro: `Blizzard's frames keep their position in an Edit Mode layout that is easy to lose and hard to share. Skins turns the Bag Bar, Micro Menu, buffs, debuffs, Cooldown Manager, Objective Tracker and the rest into part of your PrephUI profile, with a PrephUI mover that replaces the native one. Position and size are stored in the profile, so they export, import and switch with it. They are pushed into the active native layout when you log in or change profile, and pulled back when you save in Blizzard's Edit Mode. Right-click any mover for a quick panel with the same options Edit Mode would show, plus a few extras and arrow buttons to nudge it. Every part can be switched off on its own, and a part that does not exist on your client is skipped.`,
+          features: [
+            ['fa-up-down-left-right', 'Movers for empty frames', `Frames that are empty most of the time, like the Cooldown Manager, debuffs, totems or the vehicle button, keep a mover you can actually grab. The mover takes its size from Blizzard's native box and follows orientation, wrap, icon size and padding when you change them.`],
+            ['fa-sort', 'Aura frames', `Buffs and debuffs keep Blizzard's layout and you place them with a mover. Sort them by remaining time, shortest or longest first, or turn sorting off, in which case nothing is hooked and nothing runs. Auras with secret durations cannot be compared in combat, so they keep Blizzard's own order. The cooldown text format (Blizzard default, <code>1:05</code>, <code>1m5s</code>, <code>2m</code>) is offered when Quality of Life is enabled.`],
+            ['fa-bars-progress', 'Experience bar', `A slim bar you place yourself, replacing Blizzard's status tracking bar. Purple is your current XP, yellow is XP from quests you can already hand in, and light blue is rested XP. Hover for remaining XP, rested XP, total quest log XP, XP this session, XP per hour and estimated time to level. It is hidden at max level, and shown again while movers are unlocked so you can still place it. Width, height and offset are in its right-click panel. Switching it off brings Blizzard's bar back.`],
+            ['fa-hourglass-half', 'M+ timer', `Replaces Blizzard's keystone block with a compact frame. It shows the keystone level, dungeon name and affix icons (with affix tooltips), time spent and time left, and a timer bar with +3 and +2 marks that changes color as you fall behind. Enemy forces are a bar with percent and count. Deaths have a tooltip with who died, when and the killing blow, taken from the death recap when the client provides it. The final result stays up after the run. A preview shows while movers are unlocked, and it is not loaded on clients without Mythic+.`],
+            ['fa-shirt', 'Gear and quest rewards', `Item level on equipment in your character panel and bags, for weapons, armor and profession gear. An upgrade track sits next to each equipped item, colored by track: Explorer, Adventurer, Veteran, Champion, Hero and Myth. The character panel shows your average item level with two decimals. A gold coin marks the quest reward with the highest vendor price. Each of the three can be switched off on its own.`],
+            ['fa-moon', 'ESC menu', `A flat, dark game menu with matching buttons and hover states instead of Blizzard's stone frame. One switch turns it off.`],
+            ['fa-circle-info', 'Good to know', `Skins move and configure frames. Most of them do not change how Blizzard draws them yet. Values you change in Blizzard's Edit Mode are only picked up after you save or leave it. Loss of Control is a native Edit Mode system from 12.1.0 on, and older clients skip it quietly. Swing Timer and the multicast Totem Bar are for the WoW Forever client. Other clients use the plain totem frame, which has no Edit Mode system, so it is anchored directly. If the M+ enemy forces ever look wrong, <code>/mplusdebug</code> prints the raw scenario criteria.`]
+          ],
+          perf: [
+            `Event driven. Bags refresh after <code>BAG_UPDATE_DELAYED</code>, never inside Blizzard's own refresh.`,
+            `Upgrade tracks are cached per slot and cleared when that slot changes.`,
+            `Aura sorting reuses its tables, allocates nothing and skips the work when the order is already right.`,
+            `Native layout writes only happen when something actually changed. Parts that do not exist on your client register nothing.`
+          ],
+          tables: [{ title: 'Moved frames', head: ['Frame', 'Quick panel'], rows: [
+            ['Bag Bar', `Orientation, direction, size, and a real show / hide toggle, which Blizzard does not offer`],
+            ['Micro Menu', `Orientation, order, menu size, eye size`],
+            ['Buffs', `Orientation, icon wrap, direction, limit, size, padding, sorting`],
+            ['Debuffs', `The same, plus show dispel type`],
+            ['Cooldown Manager', `One mover each for Essential, Utility, Tracked Buffs and Tracked Bars`],
+            ['Objective Tracker', `Height (400 to 1000), text size, opacity`],
+            ['Loss of Control', `Size, with a live preview of icon, ability name and timer inside the mover`],
+            ['Vehicle Exit, Totem Bar', `Position only`],
+            ['Swing Timer', `One mover each for main hand, off hand and ranged, on the client that has them`]
+          ] }],
+          shots: [['ui/editmode.png', 'Edit Mode with PrephUI movers']] },
 
-                    <div class="overlay-example">
-                        <div class="overlay-example-label">Heal Absorb</div>
-                        <div class="overlay-example-image">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/healabsorb.png"
-                                alt="Heal Absorb"
-                                class="img-fluid showcase-img w-100">
-                        </div>
-                    </div>
+        { id: 'qol', icon: 'fa-hand-pointer', title: 'Quality of Life',
+          tag: `Auto loot, repair, quests and gossip, flight timers and aura timer formats.`,
+          intro: `Small conveniences for the things you click through a hundred times a day: loot, repairs, quests, gossip menus, aura timers, flight times and a few camera and nameplate settings. Nothing here changes how your UI looks, it only saves you clicks. Every feature is its own switch and every switch is on by default, so turn off what you do not want. A feature that needs an event only registers for it while it is on.`,
+          features: [
+            ['fa-sack-dollar', 'Loot and vendors', `Fast loot takes every item from a corpse or chest the moment the loot window opens, and follows your auto loot setting and auto loot modifier key. Disable loot warnings confirms the pop-ups for bind on pickup, loot rolls, selling an item that still has a trade timer, and locking items in the mail. Auto repair repairs everything when you open a vendor, from your own gold, and tells you what it cost. If you cannot afford it, it tells you that instead.`],
+            ['fa-scroll', 'Quests and gossip', `Auto-accept takes available quests and continues quests that are ready to progress. Auto turn in hands in finished quests when there is nothing to choose. Auto gossip skips through menus for vendors, banks and flight masters, and takes a lone ride or flight option when no quest is offered. Quests with more than one reward choice are never turned in for you, so the pick stays yours.`],
+            ['fa-hand', 'Hold a key to stop it', `Pick Shift, Alt, Ctrl or none. Holding that key while you talk to an NPC turns quest and gossip automation off for that conversation. Shift is the default.`],
+            ['fa-hourglass', 'Aura timers', `Choose a timer format for buffs and debuffs. It only swaps the timer text. An aura whose time is hidden by combat restrictions keeps Blizzard's text, and going back to Blizzard default hands every button back.`],
+            ['fa-feather', 'Flight timers', `Hover a destination on the flight map and the tooltip gets a Flight time line. A <code>~</code> in front means the time is estimated from the route flown the other way. While you fly, a countdown bar shows the destination name. Move it from Unlock UI, where it shows a sample bar. It survives a <code>/reload</code> or relog mid-flight and clears itself when you land. The Frequent Flier speed bonus is included automatically when you know the talent.`],
+            ['fa-camera', 'View', `Camera max zoom factor sets how far you can zoom out, and nameplate max distance sets how far away nameplates are drawn. Both are applied on login and whenever you change profile. They are set through CVars, so another addon that sets them can overwrite them until your next login or profile change.`],
+            ['fa-circle-info', 'Good to know', `Disable loot warnings confirms prompts that are there to protect you, like selling an item with a trade timer. Switch it off if you want them back. Flight times come from the game's own route data and a base flight speed, so they are a close estimate, not a stopwatch, and routes missing from the data show no time. <code>/prephflight</code> explains why a flight time is or is not shown. Run it with a flight map open after hovering a destination.`]
+          ],
+          perf: [
+            `Event driven. Fast loot, repair, quests and gossip only act on their own events, and only register while switched on.`,
+            `Aura timers use one ticker at 10 times per second instead of hooking Blizzard's per-frame duration update. Text is only rewritten when the displayed second changes, and common strings are cached.`,
+            `The ticker starts when you choose a format and stops when you go back to Blizzard default.`,
+            `Aura events are filtered to your player and vehicle, not your whole raid.`,
+            `Flight events are only registered while a flight option is on. The tooltip hook is installed the first time you open a flight map.`
+          ],
+          tables: [{ title: 'Aura timer formats', head: ['Format', 'Looks like'], rows: [
+            ['Blizzard default', `Untouched`],
+            ['1:30', `<code>1:30</code>, <code>45</code>, <code>1:02:05</code>`],
+            ['1m30s', `<code>1m30s</code>, <code>45s</code>, <code>2h5m</code>`],
+            ['2m', `One rounded unit: <code>2m</code>, <code>45s</code>, <code>3h</code>, <code>2d</code>`]
+          ] }],
+          shots: [] },
 
-                    <div class="overlay-example">
-                        <div class="overlay-example-label">Max Health Reduction</div>
-                        <div class="overlay-example-image">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/maxhealthreduce.png"
-                                alt="Max Health Reduction"
-                                class="img-fluid showcase-img w-100">
-                        </div>
-                    </div>
-                </div>
-            </div>
-    </section>
+        { id: 'raidtools', icon: 'fa-chess-board', title: 'Raid Tools & Auto Invites',
+          tag: `A raid control panel and an auto inviter driven by chat keywords.`,
+          intro: `A raid control panel for setting up and running your group, plus an auto inviter that builds the group from keywords people type in chat. Both are in the settings window under Utilities.`,
+          features: [
+            ['fa-robot', 'Auto invites', `Invites players who type your keyword in chat, optionally including guild chat. A new keyword can be temporary: set how long it lasts in minutes, or enter 0 to keep it permanently.`],
+            ['fa-people-roof', 'Guild whitelist', `Only invite from the guilds you whitelist. Your own guild is always treated as whitelisted, and you can add others. You can also accept invites from guildmates.`],
+            ['fa-check-double', 'Raid control', `A panel for ready checks, pulls and other raid utility, so you do not have to dig through Blizzard's menus.`]
+          ],
+          perf: [`Auto invites only react to chat events while enabled, so an option you do not use costs nothing.`],
+          shots: [['ui/autoinvite.png', 'Auto Invites settings'], ['ui/raidcontrol.png', 'Raid control panel']] }
+      ],
+      cta: { title: 'Get PrephUI', text: `Free, and the source is on GitHub. Bug reports and suggestions are welcome there or on Discord.`,
+        links: [['fa-brands fa-github', 'GitHub', 'https://github.com/Preph/PrephUI'], ['fa-solid fa-puzzle-piece', 'CurseForge', 'https://www.curseforge.com/wow/addons/prephui']] }
+    },
 
-    <!-- Additional QoL Features Grid -->
-    <section class="py-5 bg-surface">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h3 class="fw-bold">Everyday <span class="text-orange">Quality of Life</span></h3>
-            </div>
-            
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="feature-card h-100 d-flex flex-column">
-                        <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/settings.png" alt="Settings" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
-                        </div>
-                        <div class="mt-auto">
-                            <h5 class="mb-2"><i class="fa-solid fa-gear text-orange me-2"></i>Settings</h5>
-                            <p class="text-muted mb-0 small">A comprehensive, searchable in-game configuration menu. Customize your action bars, unit frames, nameplates, and data bars with live previews and intuitive toggles.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="feature-card h-100 d-flex flex-column">
-                        <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/chat.png" alt="Chat Skin" class="img-fluid showcase-img w-100" style="max-height: 250px; object-fit: contain; background: #111;">
-                        </div>
-                        <div class="mt-auto">
-                            <h5 class="mb-2"><i class="fa-solid fa-message text-orange me-2"></i>Chat Skin</h5>
-                            <p class="text-muted mb-0 small">A modernized chat reskin with class-colored names, chat history that sticks around after a reload, and clickable names for quick whispers.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-12">
-                    <div class="feature-card text-center p-4">
-                        <h5 class="mb-3 text-start"><i class="fa-solid fa-chart-bar text-orange me-2"></i>Global Databars</h5>
-                        <p class="text-muted mb-3 text-start small">Keep track of the things you care about at a glance. Every module is fully customizable, and hovering over one brings up a tooltip with more detail:</p>
-                        
-                        <div class="d-flex flex-wrap gap-2 mb-4 text-start">
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">System</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Clock</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Zone</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Durability</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Guild</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Friends</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Talents</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Reload</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Bags</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Gold</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">FPS</span>
-                            <span class="badge bg-dark border border-secondary text-light px-2 py-1">Latency</span>
-                            <span class="badge bg-dark border border-orange text-orange px-2 py-1">PrephsUI</span>
-                        </div>
+    /* ========================= DAMAGE METER ========================= */
+    damage: {
+      tab: 'Damage Meter', icon: 'fa-solid fa-chart-simple', hash: 'damage-meter',
+      title: `Preph's Damage Meter - PrephUI`,
+      hero: {
+        badges: ['Retail 12.1 compatible', 'WoW Forever compatible'],
+        h1: `Preph's <em>Damage Meter</em>`,
+        lead: `A damage meter that reads Blizzard's built-in combat data, so it stays light and keeps working in combat. You get up to five windows, ten meter types, a death recap on every death row, and fights that survive a reload.`,
+        shots: [['Modern Style', 'dmg/overview.png'], ['WoW Forever Style', 'dmg/overview-forever.png']]
+      },
+      categories: [
+        { id: 'tracks', icon: 'fa-chart-line', title: 'What it tracks',
+          tag: `Ten meter types, one per window.`, intro: `Every window shows one meter type. Change it from the window title or with a right-click.`,
+          features: [
+            ['fa-chart-line', 'Output', `Damage Done, Healing Done and Absorbs, with per-second values. Your own bar stays pinned when you scroll.`],
+            ['fa-shield-halved', 'Intake', `Damage Taken, Avoidable Damage Taken and Enemy Damage Taken.`],
+            ['fa-hand-fist', 'Utility', `Interrupts, Dispels, Deaths and Threat. Threat is live only and follows your target, focus or boss units.`]
+          ], shots: [] },
+        { id: 'breakdown', icon: 'fa-computer-mouse', title: 'Hover for the breakdown',
+          tag: `Abilities and targets behind every number.`, intro: `Hover a bar to see what is behind the number. Blizzard hides some values in combat, so ranks and full target lists fill in a few seconds after the fight.`,
+          features: [
+            ['fa-bolt', 'Damage and healing', `The abilities used, plus the targets hit or healed.`],
+            ['fa-burst', 'Damage taken', `Which abilities hurt, and which mobs or players dealt the damage.`],
+            ['fa-ban', 'Interrupts, dispels, absorbs', `Which abilities were stopped or removed, and who got shielded.`]
+          ], shots: [['dmg/dmgrecap.png', 'Damage breakdown tooltip']] },
+        { id: 'deaths', icon: 'fa-skull', title: 'Death recap',
+          tag: `The last hits before a player died.`, intro: `Hover a row in the Deaths meter to see the last hits before that player died, oldest first. The killing blow is highlighted.`,
+          features: [
+            ['fa-list', 'Each hit', `Ability, source, amount and seconds before death, with a health bar per hit.`],
+            ['fa-heart-pulse', 'Healing and absorbs', `Overkill and absorbed damage are shown on the hit they belong to. Received healing is inferred from health changes.`],
+            ['fa-paw', 'Feign Death filter', `Optionally hides Hunters who are feigning death from the list.`]
+          ], shots: [['dmg/deathrecap.png', 'Death recap tooltip']] },
+        { id: 'looks', icon: 'fa-wand-magic-sparkles', title: 'Two looks',
+          tag: `Modern or WoW Forever, applied to every window.`,
+          intro: `One checkbox switches every window between two looks. <strong>Modern</strong> is flat bars on a dark window. <strong>WoW Forever</strong> uses a bronze frame edge, a dark brown title bar, the classic bar texture and outlined text. Bar texture and font are set separately through LibSharedMedia.`,
+          features: [], shots: [['dmg/overview.png', 'Modern'], ['dmg/overview-forever.png', 'WoW Forever']] },
+        { id: 'windows', icon: 'fa-window-restore', title: 'Windows and fights',
+          tag: `Up to five windows, each with its own fight.`, intro: `Open up to five windows and give each one its own meter type and fight.`,
+          features: [
+            ['fa-magnet', 'Snapping', `Drag a window next to another to anchor it. It keeps its own size or matches its neighbour.`],
+            ['fa-clock-rotate-left', 'Past fights', `Pick Current, Overall or one of up to 25 recent fights. The last 5 survive a <code>/reload</code> and show up under Saved.`],
+            ['fa-key', 'Mythic+', `Data can reset when a key starts, so Overall covers exactly that key.`],
+            ['fa-link', 'Sync', `Pick a fight in one window and every window follows.`]
+          ], shots: [] },
+        { id: 'dmsettings', icon: 'fa-gear', title: 'Settings and commands',
+          tag: `Open the settings with /pdm config.`, intro: `Sliders for windows, bar height, spacing, font size, opacity, scale and combat refresh rate, and toggles for class icons, the pinned bar and locking. It works standalone, or becomes movable in PrephUI Edit Mode.`,
+          features: [],
+          tables: [{ title: 'Slash commands', head: ['Command', 'What it does'], rows: [
+            ['/pdm', `Show or hide the meter`], ['/pdm config', `Open settings`], ['/pdm windows 3', `Set the number of windows (1-5)`],
+            ['/pdm lock, unlock', `Lock or unlock position and size`], ['/pdm layout', `Reset window positions`], ['/pdm reset', `Clear all data (asks first)`]
+          ] }],
+          shots: [['dmg/settings.png', 'Damage Meter settings']] }
+      ],
+      cta: { title: 'Get it', text: `Free, and the source is on GitHub. Bug reports and suggestions are welcome there or on Discord.`,
+        links: [['fa-brands fa-github', 'GitHub', 'https://github.com/preph/PrephDamageMeter'], ['fa-solid fa-puzzle-piece', 'CurseForge', 'https://www.curseforge.com/wow/addons/prephdamagemeter']] }
+    }
+  }
+};
 
-                        <!-- Expanded Databar Module Details -->
-                        <div class="row text-start g-3 mb-4 text-muted small">
-                            <div class="col-md-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li class="mb-2"><strong>Clock:</strong> Hover to see your account-wide raid IDs along with the weekly and 3-day reset countdowns.</li>
-                                    <li class="mb-2"><strong>Guild:</strong> Hover for levels, names and &lt;AFK&gt;/&lt;DND&gt; tags. Hold <code>Shift</code> while hovering to also see zones and notes and officer notes.</li>
-                                    <li class="mb-2"><strong>Friends:</strong> Shows character level (when available), Battle.net/RealID status and details for friends on your server.</li>
-                                    <li><strong>FPS:</strong> Hover for a live breakdown of addon memory usage and CPU time.</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li class="mb-2"><strong>Gold:</strong> Shows your total gold across the whole account, with a breakdown by faction and character.</li>
-                                    <li class="mb-2"><strong>Durability:</strong> Hover to see the exact condition and percentage of every equipped item slot.</li>
-                                    <li><strong>System, Zone, Talents, Reload, Bags, Latency & PrephsUI:</strong> Quick-access modules for everyday utility, UI resets, profile management and a status overview.</li>
-                                </ul>
-                            </div>
-                        </div>
+/* Sidebar layout per product: [ [ 'Group name', [ category ids... ] ], ... ]
+   'home' is the overview page. Categories that are not listed end up in a "More" group. */
+const NAV = {
+  prephui: [
+    ['General',   ['home']],
+    ['Interface', ['unitframes', 'nameplates', 'actionbars', 'classbars', 'chat', 'databars']],
+    ['Utilities', ['skins', 'qol', 'raidtools']]
+  ],
+  damage: [
+    ['General', ['home']],
+    ['Meter',   ['tracks', 'breakdown', 'deaths', 'looks']],
+    ['Setup',   ['windows', 'dmsettings']]
+  ]
+};
+</script>
 
-                        <div class="position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/databar.png" alt="Global Databars" class="img-fluid showcase-img w-100">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<script>
+/* ---------------- Renderer (no content below this line) ---------------- */
+(() => {
+'use strict';
+const $ = (s, e = document) => e.querySelector(s);
+const $$ = (s, e = document) => [...e.querySelectorAll(s)];
+const E = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
+const tmp = document.createElement('div');
+const strip = h => { tmp.innerHTML = h || ''; return tmp.textContent.replace(/\s+/g, ' ').trim(); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const img = p => /^https?:/.test(p) ? p : SITE.base + p;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const keys = Object.keys(SITE.products);
 
-    <!-- Quality of Life Section -->
-    <section class="py-5">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Quality of <span class="text-orange">Life</span></h2>
-                <p class="text-muted">Less busywork when you're putting a group together and running it.</p>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="feature-card h-100 d-flex flex-column">
-                        <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/raidcontrol.png" alt="Raid Control" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
-                        </div>
-                        <div class="mt-auto">
-                            <h5 class="mb-2"><i class="fa-solid fa-chess-board text-orange me-2"></i>Raid Control</h5>
-                            <p class="text-muted mb-0 small">Tools for setting up your group and running the raid: ready checks, coordinated pulls and raid utility, all handled without fuss.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="feature-card h-100 d-flex flex-column">
-                        <div class="mb-4 position-relative">
-                            <img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/autoinvite.png" alt="AutoInviter" class="img-fluid showcase-img w-100" style="max-height: 280px; object-fit: contain; background: #111;">
-                        </div>
-                        <div class="mt-auto">
-                            <h5 class="mb-2"><i class="fa-solid fa-robot text-orange me-2"></i>AutoInviter</h5>
-                            <p class="text-muted mb-0 small">Automatic group invitations with custom temporary keywords, so putting a group together takes far less typing and back-and-forth.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+const state = { key: null, M: null, current: null, anchor: null, query: '', hits: null, results: null, collapsed: {}, theme: store.get('prephui.theme') || 'p:midnight' };
+const models = {};
+const ui = { sc: $('#sc'), pages: $('#pages'), res: $('#res'), nav: $('#nav'), q: $('#q'), qclr: $('#qclr'), win: $('#win'), sbar: $('#sbar') };
 
-    <!-- Footer -->
-    <footer class="py-4 text-center" style="background-color: rgba(13,13,13,0.9); border-top: 2px solid var(--brand-orange); position: relative; z-index: 10;">
-        <div class="container">
-            <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-                &copy; Prephalia 2026
-            </p>
-            <div class="mt-3">
-                <a href="https://github.com/Preph/PrephUI" target="_blank" class="text-muted me-3 text-decoration-none hover-orange"><i class="fa-brands fa-github fs-5"></i></a>
-                <a href="https://www.curseforge.com/wow/addons/prephui" target="_blank" class="text-muted me-3 text-decoration-none hover-orange" title="CurseForge"><i class="fa-solid fa-puzzle-piece fs-5"></i></a>
-                <a href="#" class="text-muted text-decoration-none hover-orange"><i class="fa-brands fa-discord fs-5"></i></a>
-            </div>
-        </div>
-    </footer>
+/* =====================================================================
+   Theme (same keys, presets and class-color math as the in-game library)
+   ===================================================================== */
+const THEME_KEYS = ['accent', 'bg', 'titlebar', 'panel', 'field', 'button', 'border', 'text', 'dim', 'value', 'danger'];
+const T0 = { accent: [.35, .55, .8], bg: [.08, .08, .08, .97], titlebar: [.106, .106, .106], panel: [.115, .115, .115], field: [.04, .04, .04],
+  button: [.2, .2, .2], border: [.22, .22, .22], text: [1, 1, 1], dim: [.6, .6, .6], value: [.7, .85, 1], danger: [.8, .3, .3] };
+const PRESETS = {
+  default:  { name: 'Default' },
+  graphite: { name: 'Graphite', theme: { accent: [.75, .75, .78], bg: [.12, .12, .12], titlebar: [.15, .15, .15], panel: [.16, .16, .16], field: [.08, .08, .08], button: [.26, .26, .26], border: [.31, .31, .31], value: [.88, .88, .9] } },
+  midnight: { name: 'Midnight', theme: { accent: [.4, .6, 1], bg: [.04, .05, .09], titlebar: [.06, .07, .12], panel: [.07, .08, .14], field: [.02, .03, .06], button: [.14, .16, .26], border: [.16, .19, .32], value: [.75, .85, 1] } },
+  forest:   { name: 'Forest', theme: { accent: [.35, .8, .5], bg: [.05, .08, .06], titlebar: [.07, .11, .08], panel: [.08, .12, .09], field: [.03, .05, .04], button: [.15, .22, .17], border: [.17, .27, .2], value: [.75, 1, .85] } },
+  crimson:  { name: 'Crimson', theme: { accent: [.85, .3, .3], bg: [.09, .05, .05], titlebar: [.12, .07, .07], panel: [.13, .08, .08], field: [.05, .03, .03], button: [.24, .14, .14], border: [.29, .17, .17], value: [1, .82, .8], danger: [.95, .55, .2] } },
+  amoled:   { name: 'AMOLED Black', theme: { bg: [0, 0, 0], titlebar: [.04, .04, .04], panel: [.05, .05, .05], field: [0, 0, 0], button: [.12, .12, .12], border: [.16, .16, .16] } }
+};
+const PRESET_ORDER = ['midnight', 'default', 'graphite', 'forest', 'crimson', 'amoled'];
+const CLASSES = { WARRIOR: ['Warrior', [.78, .61, .43]], PALADIN: ['Paladin', [.96, .55, .73]], HUNTER: ['Hunter', [.67, .83, .45]], ROGUE: ['Rogue', [1, .96, .41]],
+  PRIEST: ['Priest', [1, 1, 1]], DEATHKNIGHT: ['Death Knight', [.77, .12, .23]], SHAMAN: ['Shaman', [0, .44, .87]], MAGE: ['Mage', [.41, .8, .94]],
+  WARLOCK: ['Warlock', [.58, .51, .79]], MONK: ['Monk', [0, 1, .59]], DRUID: ['Druid', [1, .49, .04]], DEMONHUNTER: ['Demon Hunter', [.64, .19, .79]], EVOKER: ['Evoker', [.2, .58, .5]] };
+const mix = (c, to, t) => [0, 1, 2].map(i => c[i] + (to[i] - c[i]) * t);
+function classTheme(tok) {
+  const [r, g, b] = CLASSES[tok][1];
+  const lum = .299 * r + .587 * g + .114 * b;
+  const accent = mix([r, g, b], [1, 1, 1], clamp((.42 - lum) * 1.2, 0, .4));
+  const m = Math.max(r, g, b, .01), hue = [r, g, b].map(v => 1 - (1 - v / m) * .6), S = v => hue.map(h => h * v);
+  const th = { accent, bg: S(.085), titlebar: S(.115), panel: S(.13), field: S(.05), button: S(.24), border: S(.3), value: mix(accent, [1, 1, 1], .6) };
+  if (accent[0] > .6 && accent[1] < .4 && accent[2] < .45) th.danger = [.95, .55, .2];
+  return th;
+}
+function buildTheme(sel) {
+  const t = {}; THEME_KEYS.forEach(k => t[k] = [...T0[k]]);
+  const base = sel.startsWith('c:') ? (CLASSES[sel.slice(2)] ? classTheme(sel.slice(2)) : null) : (PRESETS[sel.slice(2)] || {}).theme;
+  if (base) for (const k in base) t[k] = [...base[k]];
+  t.bg = [t.bg[0], t.bg[1], t.bg[2], .97];
+  return t;
+}
+const rgb = (c, f = 1) => c.slice(0, 3).map(v => Math.round(clamp(v * f, 0, 1) * 255)).join(' ');
+function themeName(sel) { return sel.startsWith('c:') ? (CLASSES[sel.slice(2)] || ['Default'])[0] : (PRESETS[sel.slice(2)] || PRESETS.midnight).name; }
+function applyTheme(sel) {
+  if (!(sel.startsWith('c:') ? CLASSES[sel.slice(2)] : PRESETS[sel.slice(2)])) sel = 'p:midnight';
+  state.theme = sel; store.set('prephui.theme', sel);
+  const t = buildTheme(sel), s = document.documentElement.style;
+  THEME_KEYS.forEach(k => s.setProperty('--' + k, rgb(t[k])));
+  $('#themeName').textContent = themeName(sel);
+  s.setProperty('--bg-a', t.bg[3]);
+  s.setProperty('--btn-h', '74 74 74');
+  s.setProperty('--btn-d', '36 36 36');
+  s.setProperty('--acc-n', rgb(t.accent, .75));
+  s.setProperty('--acc-p', rgb(t.accent, .5));
+}
 
-    </main>
+/* =====================================================================
+   Popup menu (same look as the library's dropdown popup, search box above 14 entries)
+   ===================================================================== */
+let menuEl = null;
+function hideMenu() { if (menuEl) { menuEl.remove(); menuEl = null; document.removeEventListener('mousedown', outside, true); } }
+function outside(e) { if (menuEl && !menuEl.contains(e.target) && !e.target.closest('#themeBtn')) hideMenu(); }
+function showMenu(anchor, entries) {
+  hideMenu();
+  const m = E('div', 'menu'); menuEl = m; document.body.append(m);
+  const r = anchor.getBoundingClientRect();
+  m.style.minWidth = Math.max(r.width, 190) + 'px';
+  let list = entries, inp = null;
+  if (entries.length > 14) { inp = E('input', 'menu-s'); inp.placeholder = 'Search...'; m.append(inp); }
+  const lst = E('div', 'menu-l'); m.append(lst);
+  const draw = () => {
+    lst.innerHTML = '';
+    if (!list.length) lst.append(E('div', 'menu-e', 'No results'));
+    list.forEach(en => {
+      const b = E('button', 'mr' + (en.header ? ' hd' : '') + (en.checked ? ' on' : ''));
+      if (en.color) { const sw = E('span', 'sw'); sw.style.background = en.color; b.append(sw); }
+      b.append(document.createTextNode(en.text));
+      if (!en.header) b.onclick = () => { hideMenu(); en.func(); };
+      lst.append(b);
+    });
+  };
+  draw();
+  if (inp) inp.oninput = () => { const q = inp.value.toLowerCase(); list = q ? entries.filter(e => !e.header && e.text.toLowerCase().includes(q)) : entries; draw(); };
+  const h = m.offsetHeight;
+  m.style.right = Math.max(4, innerWidth - r.right) + 'px';
+  m.style.top = (r.bottom + h + 6 > innerHeight ? Math.max(4, r.top - h - 2) : r.bottom + 2) + 'px';
+  const sel = $('.mr.on', lst); if (sel) lst.scrollTop = Math.max(0, sel.offsetTop - 80);
+  if (inp) inp.focus();
+  setTimeout(() => document.addEventListener('mousedown', outside, true));
+}
+function themeMenu() {
+  const e = [];
+  PRESET_ORDER.forEach(id => e.push({ text: PRESETS[id].name, checked: state.theme === 'p:' + id, func: () => applyTheme('p:' + id) }));
+  e.push({ text: 'Class colors', header: true });
+  Object.keys(CLASSES).forEach(tok => e.push({ text: CLASSES[tok][0], color: 'rgb(' + rgb(CLASSES[tok][1]) + ')', checked: state.theme === 'c:' + tok, func: () => applyTheme('c:' + tok) }));
+  showMenu($('#themeBtn'), e);
+}
 
+/* =====================================================================
+   Elements: collapsible, section, preview
+   ===================================================================== */
+function setOpen(c, on) {
+  const was = c.classList.contains('open');
+  c.classList.toggle('open', !!on);
+  if (on && !was && c._onOpen) c._onOpen();
+}
+function preview(pg, parent, shots, label, sticky) {
+  const pv = E('div', 'pv' + (sticky ? ' sticky' : ''));
+  const hd = E('div', 'pv-h'), t = E('span', 'pv-t');
+  t.textContent = (label + ' preview').toUpperCase(); hd.append(t);
+  const fig = E('figure'), im = E('img'), cap = E('figcaption'), bad = E('div', 'badimg', 'Preview image not available.');
+  im.dataset.lb = '1'; fig.append(im, bad, cap);
+  const body = E('div', 'pv-b'); body.append(fig);
+  const drawSeg = () => {
+    let seg = $('.seg', hd); if (seg) seg.remove();
+    if (shots.length < 2) return;
+    seg = E('div', 'seg');
+    shots.forEach((s, i) => { const b = E('button'); b.textContent = s.cap || ('#' + (i + 1)); b.onclick = () => show(i); seg.append(b); });
+    hd.insertBefore(seg, $('.pv-x', hd));
+  };
+  const show = i => {
+    const s = shots[i]; fig.classList.remove('bad'); im.src = s.src; im.alt = s.cap || label;
+    cap.textContent = s.cap || ''; cap.hidden = !s.cap;
+    $$('.seg button', hd).forEach((b, j) => b.classList.toggle('on', j === i));
+  };
+  im.onerror = () => fig.classList.add('bad');
+  const x = E('button', 'pv-x'); x.setAttribute('aria-label', 'Fold preview'); x.innerHTML = '<span class="chev"></span>';
+  x.onclick = () => pv.classList.toggle('shut'); hd.append(x);
+  pv.append(hd, body); parent.append(pv);
+  drawSeg(); show(0);
+  pv.showSrc = src => {
+    let i = shots.findIndex(s => s.src === src);
+    if (i < 0) { shots.push({ src, cap: '' }); i = shots.length - 1; drawSeg(); }
+    pv.classList.remove('shut'); show(i);
+  };
+  if (sticky) pg.sticky = pv;
+  return pv;
+}
 
-    <!-- Damage Meter Product Page -->
-    <main id="damage-page" class="product-page" role="tabpanel" aria-labelledby="damage-tab" hidden>
-        <section class="damage-hero text-center border-bottom border-orange">
-            <div class="container">
-                <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
-                    <span class="compat-badge"><i class="fa-solid fa-circle-check text-orange me-1"></i>Retail 12.1 compatible</span>
-                    <span class="compat-badge"><i class="fa-solid fa-circle-check text-orange me-1"></i>WoW Forever compatible</span>
-                </div>
+/* =====================================================================
+   Model: pages, sidebar tree and search index for one product
+   ===================================================================== */
+function buildModel(key) {
+  const p = SITE.products[key];
+  const M = { key, p, pages: {}, order: [], entries: [], groups: [] };
 
-                <h1 class="display-3 fw-bold mb-4">Preph's <span class="text-orange">Damage Meter</span></h1>
-                <p class="lead mb-4 mx-auto" style="max-width: 820px; color: var(--text-muted);">
-                    A damage meter that reads Blizzard's built-in combat data, so it stays light and keeps working in combat.
-                    Up to five windows, ten meter types, a death recap on every death row, and fights that survive a reload.
-                </p>
+  const nav = NAV[key] || [], placed = new Set();
+  nav.forEach(([, ids]) => ids.forEach(i => placed.add(i)));
+  M.groups = nav.map(([name, ids]) => ({ name, ids: ids.slice() }));
+  const rest = p.categories.map(c => c.id).filter(id => !placed.has(id));
+  if (rest.length) M.groups.push({ name: 'More', ids: rest });
+  const groupOf = {}; M.groups.forEach(g => g.ids.forEach(i => groupOf[i] = g.name));
 
-                <div class="damage-style-switcher mb-3" role="group" aria-label="Damage Meter visual style">
-                    <button type="button" class="damage-style-btn" data-damage-style="forever" aria-pressed="false">
-                        <i class="fa-solid fa-layer-group me-2"></i>WoW Forever Style
-                    </button>
-                    <button type="button" class="damage-style-btn active" data-damage-style="modern" aria-pressed="true">
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Modern Style
-                    </button>
-                </div>
-                <div id="damage-style-label" class="damage-style-label mb-4">Modern Style</div>
+  /* ---- search index ---- */
+  const prep = e => {
+    e.l = e.label.toLowerCase(); e.t = (e.tip || '').toLowerCase();
+    e.k = ((e.section || '') + ' ' + e.page.title + ' ' + (e.page.group || '') + ' ' + (e.page.parent ? e.page.parent.title : '') + ' ' + (e.kw || '')).toLowerCase();
+  };
+  const ix = (pg, el, label, kind, tip, kw) => {
+    const html = label || '';
+    const e = { page: pg, el, kind, label: strip(html), tip: strip(tip || ''), kw, section: pg.path.join(' '),
+      crumb: pg.crumb + (pg.path.length ? ' > ' + pg.path.join(' > ') : '') };
+    if (!e.label && !e.tip) return;
+    prep(e); pg.entries.push(e); M.entries.push(e);
+    if (el) el.classList.add('sx');
+    return e;
+  };
 
-                <div class="hero-showcase damage-hero-showcase px-3">
-                    <img id="damage-style-image" src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png"
-                         alt="Preph's Damage Meter Modern Style overview"
-                         class="img-fluid showcase-img w-100 damage-hero-image" style="max-width: 1000px;">
-                </div>
-            </div>
-        </section>
+  /* ---- element helpers ---- */
+  const para = (pg, parent, html, cls) => { const e = E('p', 'para' + (cls ? ' ' + cls : ''), html); parent.append(e); ix(pg, e, html, 'Text'); return e; };
+  const sec = (pg, parent, title, fn, open = true) => col(pg, parent, title, { open, kind: 'Section' }, fn);
+  const col = (pg, parent, title, o, fn) => {
+    const c = E('div', 'col' + (o.open ? ' open' : '')), h = E('button', 'col-h');
+    h.innerHTML = '<span class="chev"></span><span class="col-t"></span>';
+    $('.col-t', h).textContent = title;
+    const b = E('div', 'col-b'); c.append(h, b); parent.append(c);
+    c._onOpen = o.onOpen;
+    h.onclick = () => setOpen(c, !c.classList.contains('open'));
+    c.id = o.id; ix(pg, c, title, o.kind || 'Feature', o.tip);
+    pg.path.push(strip(title)); fn(b); pg.path.pop();
+    return c;
+  };
+  const row = (pg, parent, icon, html, kind) => {
+    const r = E('div', 'prow', `<i class="fa-solid ${icon}"></i><span>${html}</span>`); parent.append(r);
+    ix(pg, r, html, kind || 'Text'); return r;
+  };
 
-        <section class="py-5 bg-surface">
-            <div class="container py-5">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold">What it <span class="text-orange">tracks</span></h2>
-                    <p class="text-muted mx-auto" style="max-width: 720px;">
-                        Every window shows one meter type. Change it from the window title or with a right-click.
-                    </p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="damage-feature-card">
-                            <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
-                            <h4 class="fw-bold">Output</h4>
-                            <p class="text-muted mb-0">Damage Done, Healing Done and Absorbs. Bars show per-second values next to the total, and your own bar stays pinned when you scroll past it.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="damage-feature-card">
-                            <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                            <h4 class="fw-bold">Intake</h4>
-                            <p class="text-muted mb-0">Damage Taken, Avoidable Damage Taken and Enemy Damage Taken. Useful for seeing who ate the mechanic and what your group did to each mob.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="damage-feature-card">
-                            <div class="feature-icon"><i class="fa-solid fa-hand-fist"></i></div>
-                            <h4 class="fw-bold">Utility</h4>
-                            <p class="text-muted mb-0">Interrupts, Dispels, Deaths and Threat. Threat is live only: it follows your target, focus or boss units and shows accumulated threat and percent.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+  /* ---- page definitions ---- */
+  const defs = [{ id: 'home', title: 'Overview', noHeader: true, build: homeBuild }];
+  p.categories.forEach(c => defs.push({ id: c.id, title: c.title, desc: c.tag, build: (root, pg) => categoryBuild(root, pg, c) }));
 
-        <section class="py-5">
-            <div class="container py-5">
-                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
-                    <div class="col-lg-7 order-2 order-lg-1"><img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/dmgrecap.png" alt="Damage breakdown tooltip" class="img-fluid showcase-img w-100 damage-showcase"></div>
-                    <div class="col-lg-5 order-1 order-lg-2">
-                        <h3 class="fw-bold mb-3">Hover for the <span class="text-orange">breakdown</span></h3>
-                        <p class="text-muted">Mouse over any bar to see what is behind the number. What you see depends on the meter type:</p>
-                        <ul class="dm-facts">
-                            <li><strong>Damage and healing:</strong> abilities, plus the targets hit or healed.</li>
-                            <li><strong>Damage taken:</strong> which abilities hurt, and which mobs or players dealt it.</li>
-                            <li><strong>Interrupts and dispels:</strong> which abilities were stopped or removed.</li>
-                            <li><strong>Absorbs:</strong> shield abilities and who got shielded.</li>
-                        </ul>
-                        <p class="text-muted small mt-3 mb-0">Blizzard hides some values while you are in combat. Ranks and full target lists fill in a few seconds after the fight ends, and the tooltip tells you when something isn't available yet.</p>
-                    </div>
-                </div>
+  const mk = (d, parent) => {
+    const pg = { id: d.id, title: strip(d.title), desc: d.desc, noHeader: d.noHeader, icon: d.icon, build: d.build, parent, children: [], anchors: [], entries: [], path: [],
+      root: E('div', 'page'), group: parent ? parent.group : (groupOf[d.id] || null) };
+    pg.root.hidden = true;
+    pg.crumb = (pg.group ? pg.group + ' > ' : '') + (parent ? parent.title + ' > ' : '') + pg.title;
+    M.pages[pg.id] = pg; M.order.push(pg.id);
+    if (parent) parent.children.push(pg);
+    return pg;
+  };
+  defs.forEach(d => mk(d, null));
 
-                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
-                    <div class="col-lg-5">
-                        <h3 class="fw-bold mb-3">Death <span class="text-orange">recap</span></h3>
-                        <p class="text-muted">Hover a row in the Deaths meter to see the last hits before that player died, oldest first, with the killing blow highlighted.</p>
-                        <ul class="dm-facts">
-                            <li>Each hit shows its ability, source, amount and how many seconds before death it landed.</li>
-                            <li>A health bar per hit shows how quickly they dropped.</li>
-                            <li>Absorbed damage and overkill are listed on the hit they belong to.</li>
-                            <li>Healing they received is inferred from health changes and shown in green.</li>
-                            <li>A summary line gives hit count, damage taken and top damage sources.</li>
-                            <li>Hunters using Feign Death are filtered out, so they don't show up as real deaths (optional).</li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-7"><img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/deathrecap.png" alt="Death recap tooltip" class="img-fluid showcase-img w-100 damage-showcase"></div>
-                </div>
+  M.order.forEach(id => {
+    const pg = M.pages[id], root = pg.root;
+    let hd = null;
+    if (!pg.noHeader) {
+      hd = E('div', 'ph'); const h = E('h1'); h.textContent = pg.title; hd.append(h); root.append(hd);
+      if (pg.desc) { const d = E('p', 'para', pg.desc); root.append(d); }
+    }
+    const pe = { page: pg, el: root, kind: 'Page', label: pg.title, tip: strip(pg.desc || ''), section: '', crumb: pg.crumb };
+    prep(pe); pg.entries.push(pe); M.entries.push(pe);
+    pg.build(root, pg);
+    if (hd && $('.col', root)) {
+      const un = E('button', 'btn ghost', 'Uncollapse All'), co = E('button', 'btn ghost', 'Collapse All');
+      un.onclick = () => $$('.col', root).forEach(c => setOpen(c, true));
+      co.onclick = () => { $$('.col', root).forEach(c => setOpen(c, false)); ui.sc.scrollTop = 0; };
+      hd.append(co, un);
+    }
+  });
 
-                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
-                    <div class="col-lg-7 order-2 order-lg-1"><img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview-forever.png" alt="Damage Meter WoW Forever style" class="img-fluid showcase-img w-100 damage-showcase"></div>
-                    <div class="col-lg-5 order-1 order-lg-2">
-                        <h3 class="fw-bold mb-3">Two <span class="text-orange">looks</span></h3>
-                        <p class="text-muted"><strong class="text-light">Modern</strong> is flat bars on a dark window. <strong class="text-light">WoW Forever</strong> uses a bronze frame edge, a dark brown title bar, the classic bar texture and outlined text. It is one checkbox in the settings and applies to all windows at once.</p>
-                        <p class="text-muted mb-0">Bar texture and font can be changed separately if you have LibSharedMedia loaded.</p>
-                    </div>
-                </div>
+  /* ---- page builders ---- */
+  function homeBuild(root, pg) {
+    const h = p.hero, a = p.about;
+    const hero = E('div', 'hero');
+    hero.innerHTML = (h.badges || []).map(b => `<span class="badge">${b}</span>`).join('') + `<h1 class="h1">${h.h1}</h1><p class="lead">${h.lead}</p>`;
+    root.append(hero);
+    ix(pg, $('.h1', hero), h.h1, 'Text', h.lead);
+    (h.badges || []).forEach(b => ix(pg, null, b, 'Text'));
+    preview(pg, root, h.shots.map(s => ({ src: img(s[1] || s[0]), cap: s[1] ? s[0] : '' })), p.tab, false);
+    if (a) sec(pg, root, strip(a.title), b => {
+      a.text.forEach(t => para(pg, b, t));
+      a.points.forEach(x => row(pg, b, x[0], x[1]));
+      if (a.shot) { const w = E('div'); w.style.marginTop = '10px'; b.append(w); preview(pg, w, [{ src: img(a.shot), cap: 'Edit Mode' }], 'Edit Mode', false); }
+    });
+    sec(pg, root, 'Explore', b => {
+      const g = E('div', 'cards');
+      p.categories.forEach(c => {
+        const k = E('button', 'card', `<i class="fa-solid ${c.icon}"></i><div><b>${c.title}</b><span>${strip(c.tag || '')}</span></div>`);
+        k.onclick = () => select(c.id); g.append(k);
+      });
+      b.append(g);
+    });
+    sec(pg, root, strip(p.cta.title), b => {
+      b.append(E('p', 'para cta-p', p.cta.text));
+      ix(pg, b.lastChild, p.cta.text, 'Text');
+      const r = E('div', 'btnrow');
+      p.cta.links.forEach((l, i) => r.append(E('a', 'btn' + (i ? '' : ' acc'), `<i class="${l[0]}"></i> ${l[1]}`)));
+      $$('a', r).forEach((a, i) => { a.href = p.cta.links[i][2]; a.target = '_blank'; a.rel = 'noopener'; });
+      b.append(r);
+    });
+  }
 
-                <div class="row align-items-center g-5 mb-5 pb-5 border-bottom border-dark">
-                    <div class="col-lg-5">
-                        <h3 class="fw-bold mb-3">Windows and <span class="text-orange">fights</span></h3>
-                        <ul class="dm-facts">
-                            <li><strong>1 to 5 windows.</strong> Each has its own meter type and its own fight. A new second window starts on healing, a third on damage taken.</li>
-                            <li><strong>Snapping.</strong> Drag a window next to another and it offers to anchor, either keeping its size or matching the neighbour.</li>
-                            <li><strong>Current, Overall and past fights.</strong> Pick from the fight button in the window header. Up to 25 recent fights are listed.</li>
-                            <li><strong>Survives /reload.</strong> The last 5 fights and Overall are saved, with ability details, and show up under "Saved".</li>
-                            <li><strong>Mythic+.</strong> Data can reset when a key starts, so Overall covers exactly that key.</li>
-                            <li><strong>Sync option.</strong> Pick a fight in one window and every window follows.</li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-7"><img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png" alt="Damage Meter with several windows" class="img-fluid showcase-img w-100 damage-showcase"></div>
-                </div>
+  function categoryBuild(root, pg, c) {
+    if (c.intro) para(pg, root, c.intro);
+    let pv = null;
+    if (c.shots && c.shots.length) pv = preview(pg, root, c.shots.map(s => ({ src: img(s[0]), cap: s[1] || '' })), strip(c.title), false);
+    (c.features || []).forEach(f =>
+      col(pg, root, f[1], { open: true, tip: f[2], onOpen: () => { if (f[3] && pv) pv.showSrc(img(f[3])); } }, cb => cb.append(E('p', 'para', f[2]))));
+    const anchor = (id, title, el) => pg.anchors.push({ id, title, el });
+    (c.tables || []).forEach((t, i) => anchor('t' + i, t.title || 'Reference', tableBuild(root, pg, t, 't' + i)));
+    if (c.perf && c.perf.length)
+      anchor('perf', 'Performance', col(pg, root, 'Performance', { id: 'perf', open: false, kind: 'Section' }, b => {
+        c.perf.forEach(x => row(pg, b, 'fa-check', x, 'Performance'));
+      }));
+    if ((c.shots || []).length > 1) anchor('shots', 'Screenshots', galleryBuild(root, pg, c));
+  }
 
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-5 order-2 order-lg-1">
-                        <h3 class="fw-bold mb-3">Settings</h3>
-                        <p class="text-muted">Open with <code>/pdm config</code>.</p>
-                        <ul class="dm-facts">
-                            <li><strong>Sliders:</strong> windows (1-5), bar height, bar spacing, font size, background opacity, scale, and refresh rate in combat (0.2 to 5 seconds).</li>
-                            <li><strong>Fonts and textures</strong> from LibSharedMedia, previewed in the picker.</li>
-                            <li><strong>Toggles:</strong> class and spec icons, per-second values, pin my bar, lock windows, padlock only on mouseover.</li>
-                            <li><strong>Behaviour:</strong> hide Blizzard's own meter, jump to Current on the next pull, reset on keystone start, sync fight selection.</li>
-                            <li><strong>Reset</strong> for window layout or for all data, plus an in-game changelog.</li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-7 order-1 order-lg-2"><img src="https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/settings.png" alt="Preph's Damage Meter settings" class="img-fluid showcase-img w-100 damage-showcase"></div>
-                </div>
-            </div>
-        </section>
+  function tableBuild(root, pg, t, id) {
+    return col(pg, root, t.title || 'Reference', { id, open: false, kind: 'Section' }, b => {
+      let inp = null;
+      if (t.rows.length > 8) { inp = E('input', 'filter'); inp.placeholder = 'Filter...'; inp.setAttribute('aria-label', 'Filter'); b.append(inp); }
+      const w = E('div', 'tw'), tb = E('table'), tr0 = E('tr');
+      t.head.forEach(hh => tr0.append(E('th', null, hh)));
+      const th = E('thead'); th.append(tr0); const body = E('tbody'); tb.append(th, body);
+      const trs = t.rows.map(r => {
+        const tr = E('tr'); r.forEach(cell => tr.append(E('td', null, cell))); body.append(tr);
+        ix(pg, tr, r[0], 'Entry', r.slice(1).join(' ')); tr._t = strip(r.join(' ')).toLowerCase(); return tr;
+      });
+      if (inp) inp.oninput = () => { const q = inp.value.toLowerCase().trim(); trs.forEach(tr => tr.hidden = !!q && !tr._t.includes(q)); };
+      w.append(tb); b.append(w);
+    });
+  }
 
-        <section class="py-5 bg-surface">
-            <div class="container py-5">
-                <div class="row g-5">
-                    <div class="col-lg-6">
-                        <h3 class="fw-bold mb-3">Works with PrephUI</h3>
-                        <p class="text-muted">Install it alongside PrephUI and the windows become movable elements in PrephUI's edit mode, so you can anchor them to your other frames. Without PrephUI it runs as a normal standalone addon.</p>
-                        <p class="text-muted mb-0">Text is localized, and Chinese and Russian clients get a font that can display their characters.</p>
-                    </div>
-                    <div class="col-lg-6">
-                        <h3 class="fw-bold mb-3">Slash commands</h3>
-                        <table class="dm-cmd">
-                            <tr><td>/pdm</td><td>Show or hide the meter</td></tr>
-                            <tr><td>/pdm config</td><td>Open settings</td></tr>
-                            <tr><td>/pdm windows 3</td><td>Set the number of windows (1-5)</td></tr>
-                            <tr><td>/pdm lock, unlock</td><td>Lock or unlock position and size</td></tr>
-                            <tr><td>/pdm layout</td><td>Reset window positions</td></tr>
-                            <tr><td>/pdm reset</td><td>Clear all data (asks first)</td></tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
+  function galleryBuild(root, pg, c) {
+    return col(pg, root, 'Screenshots', { id: 'shots', open: false, kind: 'Section' }, b => {
+      const g = E('div', 'gal');
+      c.shots.forEach(s => {
+        const f = E('figure'), im = E('img'); im.src = img(s[0]); im.alt = s[1] || ''; im.loading = 'lazy'; im.dataset.lb = '1';
+        im.onerror = () => f.classList.add('bad'); f.append(im);
+        if (s[1]) { f.append(E('figcaption', null, s[1])); ix(pg, f, s[1], 'Screenshot'); }
+        g.append(f);
+      });
+      b.append(g);
+    });
+  }
+  return M;
+}
 
-        <section class="py-5">
-            <div class="container py-4 text-center">
-                <h2 class="fw-bold mb-3">Get it</h2>
-                <p class="text-muted mx-auto mb-4" style="max-width: 560px;">Free, and the source is on GitHub. Bug reports and suggestions are welcome there or on Discord.</p>
-                <a href="https://github.com/preph/PrephDamageMeter" target="_blank" class="btn btn-orange px-4 me-2"><i class="fa-brands fa-github me-2"></i>GitHub</a>
-                <a href="https://www.curseforge.com/wow/addons/prephdamagemeter" target="_blank" class="btn btn-outline-orange px-4"><i class="fa-solid fa-puzzle-piece me-2"></i>CurseForge</a>
-            </div>
-        </section>
+/* =====================================================================
+   Sidebar
+   ===================================================================== */
+function navModel(M) {
+  const hits = state.query ? state.hits : null, list = [];
+  const vis = pg => !hits || hits[pg.id] > 0;
+  M.groups.forEach(g => {
+    const roots = g.ids.map(id => M.pages[id]).filter(Boolean);
+    if (!roots.some(vis)) return;
+    list.push({ group: g.name });
+    roots.forEach(pg => {
+      if (!vis(pg)) return;
+      const kids = pg.anchors.length > 0;
+      list.push({ page: pg, depth: 0, kids, count: hits ? hits[pg.id] : null });
+      if (kids && !hits && !state.collapsed[pg.id]) pg.anchors.forEach(a => list.push({ page: pg, anchor: a, depth: 1 }));
+    });
+  });
+  return list;
+}
+function renderNav() {
+  const keep = ui.nav.scrollTop, frag = document.createDocumentFragment();
+  navModel(state.M).forEach(r => {
+    if (r.group) { const g = E('div', 'ng'); g.textContent = r.group.toUpperCase(); frag.append(g); return; }
+    const pg = r.page, here = state.current === pg.id && !state.query;
+    const on = r.anchor ? here && state.anchor === r.anchor.id : here && !state.anchor;
+    const b = E('div', 'nr' + (on ? ' on' : '')); b.dataset.id = pg.id; if (r.anchor) b.dataset.anchor = r.anchor.id; b.style.paddingLeft = (6 + r.depth * 14) + 'px';
+    b.setAttribute('role', 'button'); b.tabIndex = 0;
+    const ch = E('span', 'nchev' + (r.kids && !r.anchor && !state.query ? '' : ' none'), `<span class="chev${state.collapsed[pg.id] ? '' : ' dn'}"></span>`);
+    ch.dataset.tog = pg.id;
+    const t = E('span', 'nt'); t.textContent = r.anchor ? r.anchor.title : pg.title;
+    const c = E('span', 'nc'); c.textContent = r.count != null ? r.count : '';
+    b.append(ch, t, c); frag.append(b);
+  });
+  ui.nav.replaceChildren(frag); ui.nav.scrollTop = keep;
+}
+ui.nav.addEventListener('click', e => {
+  const tg = e.target.closest('[data-tog]');
+  if (tg && !tg.classList.contains('none')) { state.collapsed[tg.dataset.tog] = !state.collapsed[tg.dataset.tog]; renderNav(); return; }
+  const r = e.target.closest('.nr'); if (r) select(r.dataset.id, { anchor: r.dataset.anchor });
+});
+ui.nav.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const r = e.target.closest('.nr'); if (r) { e.preventDefault(); select(r.dataset.id, { anchor: r.dataset.anchor }); }
+});
+function renderSideBar() {
+  const p = state.M.p, f = document.createDocumentFragment(), seen = new Set();
+  const add = (icon, text, href, acc) => {
+    if (seen.has(href)) return; seen.add(href);
+    const a = E('a', 'btn' + (acc ? ' acc' : ''), `<i class="${icon}"></i> `); a.append(document.createTextNode(text));
+    a.href = href; a.target = '_blank'; a.rel = 'noopener'; f.append(a);
+  };
+  p.cta.links.forEach((l, i) => add(l[0], l[1], l[2], i === 0));
+  SITE.links.filter(l => l[0].includes('discord')).forEach(l => add(l[0], 'Discord', l[1], false));
+  const ft = E('div', 'foot', SITE.footer); f.append(ft);
+  ui.sbar.replaceChildren(f);
+}
 
-        <footer class="py-4 text-center" style="background-color: rgba(13,13,13,0.9); border-top: 2px solid var(--brand-orange); position: relative; z-index: 10;">
-            <div class="container">
-                <p class="mb-0 text-muted" style="font-size: 0.95rem;">&copy; Prephalia 2026</p>
-                <div class="mt-3">
-                    <a href="https://github.com/Preph" target="_blank" class="text-muted me-3 text-decoration-none hover-orange"><i class="fa-brands fa-github fs-5"></i></a>
-                    <a href="https://www.curseforge.com/members/prephalia/projects" target="_blank" class="text-muted me-3 text-decoration-none hover-orange" title="CurseForge"><i class="fa-solid fa-puzzle-piece fs-5"></i></a>
-                    <a href="https://discord.gg/2Ey3zd4qg" class="text-muted text-decoration-none hover-orange"><i class="fa-brands fa-discord fs-5"></i></a>
-                </div>
-            </div>
-        </footer>
-    </main>
+/* =====================================================================
+   Search (ranking identical to the library: label start > word start > anywhere > section/page > tooltip)
+   ===================================================================== */
+const KIND_ORDER = null;
+function labelScore(l, tok) {
+  const pos = l.indexOf(tok);
+  if (pos < 0) return null;
+  if (pos === 0) return 100;
+  if (l.indexOf(' ' + tok) >= 0) return 80;
+  return 60;
+}
+function search(q, limit = 80) {
+  const tokens = q.toLowerCase().split(/\s+/).filter(Boolean), res = [];
+  if (!tokens.length) return { res, tokens };
+  state.M.entries.forEach((e, seq) => {
+    let score = 0, ok = true, viaTip = false;
+    for (const tok of tokens) {
+      let s = labelScore(e.l, tok);
+      if (s == null) { if (e.k.includes(tok)) s = 25; else if (e.t.includes(tok)) { s = 15; viaTip = true; } }
+      if (s == null) { ok = false; break; }
+      score += s;
+    }
+    if (ok) res.push({ e, score, viaTip, seq });
+  });
+  res.sort((a, b) => b.score - a.score || a.seq - b.seq);
+  return { res: res.slice(0, limit), tokens };
+}
+function hl(text, tokens) {
+  const low = text.toLowerCase(), marks = [];
+  tokens.forEach(t => { const i = low.indexOf(t); if (i >= 0) marks.push([i, i + t.length]); });
+  if (!marks.length) return esc(text);
+  marks.sort((a, b) => a[0] - b[0]);
+  const merged = [marks[0]];
+  for (let i = 1; i < marks.length; i++) { const l = merged[merged.length - 1]; if (marks[i][0] <= l[1]) l[1] = Math.max(l[1], marks[i][1]); else merged.push(marks[i]); }
+  let out = '', pos = 0;
+  merged.forEach(m => { out += esc(text.slice(pos, m[0])) + '<mark>' + esc(text.slice(m[0], m[1])) + '</mark>'; pos = m[1]; });
+  return out + esc(text.slice(pos));
+}
+function snippet(text, tokens) {
+  const low = text.toLowerCase();
+  for (const t of tokens) {
+    const s = low.indexOf(t);
+    if (s >= 0) { const a = Math.max(0, s - 24); return (a > 0 ? '...' : '') + text.slice(a, a + 80) + (text.length > a + 80 ? '...' : ''); }
+  }
+  return text.slice(0, 80);
+}
+function renderResults(res, tokens, q) {
+  const r = ui.res; r.replaceChildren();
+  const t = E('div', 'rt'); t.innerHTML = res.length ? (res.length === 1 ? '1 result' : res.length + ' results') : 'No settings match &nbsp;<b>' + esc(q) + '</b>';
+  r.append(t);
+  res.forEach(x => {
+    const e = x.e, b = E('button', 'rr');
+    const label = e.label || e.page.title, shown = label.length > 90 ? snippet(label, tokens) : label;
+    let sub = esc(e.crumb);
+    if (x.viaTip && e.tip) sub += ' &nbsp;-&nbsp; ' + hl(snippet(e.tip, tokens), tokens);
+    else if (e.kind === 'Page' && e.tip) sub += ' &nbsp;-&nbsp; ' + esc(snippet(e.tip, tokens));
+    b.innerHTML = `<span class="k">${esc(e.kind)}</span><span class="l">${hl(shown, tokens)}</span><span class="s">${sub}</span>`;
+    b.onclick = () => goTo(e);
+    r.append(b);
+  });
+  r.hidden = false;
+}
+function onSearch(text) {
+  text = text.trim();
+  ui.qclr.hidden = !text;
+  if (!text) { if (state.query) { state.query = ''; state.hits = null; state.results = null; showCurrent(); renderNav(); } return; }
+  state.query = text;
+  const { res, tokens } = search(text);
+  state.results = res;
+  const hits = {}; res.forEach(r => hits[r.e.page.id] = (hits[r.e.page.id] || 0) + 1); state.hits = hits;
+  state.M.order.forEach(i => state.M.pages[i].root.hidden = true);
+  renderResults(res, tokens, text);
+  ui.sc.scrollTop = 0;
+  renderNav();
+}
+let searchGen = 0;
+ui.q.addEventListener('input', () => {
+  const v = ui.q.value; searchGen++;
+  if (!v.trim()) { onSearch(v); return; }
+  const g = searchGen;
+  setTimeout(() => { if (g === searchGen) onSearch(ui.q.value); }, 100);
+});
+ui.q.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { ui.q.value = ''; onSearch(''); ui.q.blur(); }
+  if (e.key === 'Enter') {
+    if (state.query !== ui.q.value.trim()) { searchGen++; onSearch(ui.q.value); }
+    const r = state.results && state.results[0]; if (r) goTo(r.e);
+  }
+});
+ui.qclr.onclick = () => { ui.q.value = ''; onSearch(''); ui.q.focus(); };
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+/* =====================================================================
+   Navigation: select a page, jump to an element, hash routing
+   ===================================================================== */
+function showCurrent() {
+  const M = state.M;
+  M.order.forEach(i => M.pages[i].root.hidden = true);
+  ui.res.hidden = true;
+  const pg = M.pages[state.current]; if (!pg) return;
+  pg.root.hidden = false; ui.sc.scrollTop = 0;
+}
+function hashFor(key, id, anchor) {
+  const h = SITE.products[key].hash, pid = id && id !== 'home' ? id + (anchor ? ':' + anchor : '') : '';
+  return h && pid ? h + '/' + pid : (h || pid);
+}
+function select(id, o = {}) {
+  const M = state.M, pg = M.pages[id] || M.pages.home;
+  const a = o.anchor && pg.anchors.find(x => x.id === o.anchor);
+  ui.q.value = ''; ui.qclr.hidden = true; state.query = ''; state.hits = null; state.results = null;
+  const changed = state.current !== pg.id;
+  if (pg.anchors.length && (changed || a)) state.collapsed[pg.id] = false;
+  state.current = pg.id; state.anchor = a ? a.id : null;
+  showCurrent(); renderNav();
+  const h = hashFor(state.key, pg.id, state.anchor);
+  if (o.push !== false && location.hash.slice(1) !== h) history.pushState(null, '', h ? '#' + h : location.pathname + location.search);
+  document.title = (pg.id === 'home' ? '' : pg.title + ' - ') + M.p.title;
+  ui.win.classList.remove('nav-open');
+  if (a) {
+    setOpen(a.el, true);
+    const go = () => scrollToEl(pg, a.el);
+    setTimeout(() => { go(); flash(a.el); }, 50); setTimeout(go, 220);
+  }
+}
+function reveal(page, el) {
+  for (let p = el; p && p !== page.root; p = p.parentElement) if (p.classList.contains('col')) setOpen(p, true);
+  const pv = $('.pv.shut', page.root); if (pv && pv.classList.contains('sticky')) pv.classList.remove('shut');
+}
+function scrollToEl(page, el) {
+  const sc = ui.sc, off = 18 + (page.sticky && !page.sticky.classList.contains('shut') && getComputedStyle(page.sticky).position === 'sticky' ? page.sticky.offsetHeight : page.sticky ? 30 : 0);
+  sc.scrollTop += el.getBoundingClientRect().top - sc.getBoundingClientRect().top - off;
+}
+function flash(el) {
+  const f = E('div', 'flash'); el.append(f); setTimeout(() => f.remove(), 1900);
+}
+function goTo(e) {
+  select(e.page.id);
+  const el = e.el;
+  if (!el || e.kind === 'Page') return;
+  reveal(e.page, el);
+  setTimeout(() => { scrollToEl(e.page, el); flash(el); }, 50);
+  setTimeout(() => scrollToEl(e.page, el), 220);
+}
+function parseHash() {
+  const parts = location.hash.slice(1).split('/');
+  const key = keys.find(k => SITE.products[k].hash && SITE.products[k].hash === parts[0]);
+  const raw = (key ? parts[1] : parts[0]) || ''; const [pid, anc] = raw.split(':');
+  return { key: key || keys[0], page: pid || null, anchor: anc || null };
+}
+function setProduct(key) {
+  state.key = key; state.M = models[key] || (models[key] = buildModel(key));
+  const M = state.M;
+  ui.pages.replaceChildren(...M.order.map(i => M.pages[i].root));
+  state.collapsed = {}; M.order.forEach(i => { if (M.pages[i].anchors.length) state.collapsed[i] = true; });
+  state.current = null; state.query = ''; ui.q.value = ''; ui.qclr.hidden = true;
+  $$('.ptab').forEach(t => t.classList.toggle('on', t.dataset.k === key));
+  renderSideBar();
+}
+function route() {
+  const { key, page, anchor } = parseHash();
+  if (key !== state.key) setProduct(key);
+  select(page || 'home', { push: false, anchor });
+}
 
-    <script>
-        // Damage Meter visual style switcher
-        (() => {
-            const image = document.getElementById('damage-style-image');
-            const label = document.getElementById('damage-style-label');
-            const buttons = document.querySelectorAll('[data-damage-style]');
+/* =====================================================================
+   Chrome: title bar, mobile drawer, lightbox, shortcuts
+   ===================================================================== */
+$('#brand').textContent = SITE.brand;
+$('#tabs').innerHTML = keys.map(k => `<button class="ptab" data-k="${k}"><i class="${SITE.products[k].icon}"></i>${SITE.products[k].tab}</button>`).join('');
+$('#links').innerHTML = SITE.links.map(l => `<a href="${l[1]}" target="_blank" rel="noopener" aria-label="${l[0].split('-').pop()}"><i class="${l[0]}"></i></a>`).join('');
+$('#tabs').addEventListener('click', e => {
+  const t = e.target.closest('.ptab'); if (!t) return;
+  if (t.dataset.k !== state.key) setProduct(t.dataset.k);
+  select('home');
+});
+$('#themeBtn').onclick = () => { if (menuEl) hideMenu(); else themeMenu(); };
+$('#burger').onclick = () => ui.win.classList.toggle('nav-open');
+$('#scrim').onclick = () => ui.win.classList.remove('nav-open');
+document.addEventListener('click', e => {
+  const im = e.target.closest('img[data-lb]');
+  if (im) { $('#lb img').src = im.currentSrc || im.src; $('#lb').classList.add('on'); }
+  else if (e.target.closest('#lb')) $('#lb').classList.remove('on');
+});
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') { $('#lb').classList.remove('on'); hideMenu(); }
+  const typing = /^(INPUT|TEXTAREA)$/.test((e.target.tagName || ''));
+  if (!typing && (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'))) {
+    e.preventDefault(); ui.win.classList.add('nav-open'); ui.q.focus(); ui.q.select();
+  }
+});
+addEventListener('popstate', route);
 
-            if (!image || !label || !buttons.length) return;
-
-            const styles = {
-                modern: {
-                    src: 'https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview.png',
-                    alt: "Preph's Damage Meter Modern Style overview",
-                    label: 'Modern Style'
-                },
-                forever: {
-                    src: 'https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/dmg/overview-forever.png',
-                    alt: "Preph's Damage Meter WoW Forever Style overview",
-                    label: 'WoW Forever Style'
-                }
-            };
-
-            buttons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const selected = styles[button.dataset.damageStyle];
-                    if (!selected || image.src.endsWith(selected.src)) return;
-
-                    buttons.forEach(btn => {
-                        const active = btn === button;
-                        btn.classList.toggle('active', active);
-                        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-                    });
-
-                    image.classList.add('is-switching');
-                    window.setTimeout(() => {
-                        image.src = selected.src;
-                        image.alt = selected.alt;
-                        label.textContent = selected.label;
-                    }, 90);
-                    window.setTimeout(() => image.classList.remove('is-switching'), 190);
-                });
-            });
-        })();
-    </script>
-
-    <script>
-        // Product tab switching + shareable GitHub Pages hash URL.
-        // This stays on the same index.html; #damage-meter is only a URL fragment.
-        (() => {
-            const tabs = document.querySelectorAll('.product-tab');
-            const prephuiPage = document.getElementById('prephui-page');
-            const damagePage = document.getElementById('damage-page');
-
-            if (!tabs.length || !prephuiPage || !damagePage) return;
-
-            const titles = {
-                prephui: 'PrephUI - Modern WoW Interface',
-                damage: "Preph's Damage Meter - PrephUI"
-            };
-
-            function setProduct(product, { updateUrl = false, scroll = true } = {}) {
-                const isDamage = product === 'damage';
-
-                tabs.forEach(tab => {
-                    const active = tab.dataset.product === product;
-                    tab.classList.toggle('active', active);
-                    tab.setAttribute('aria-selected', active ? 'true' : 'false');
-                });
-
-                prephuiPage.hidden = isDamage;
-                damagePage.hidden = !isDamage;
-                document.title = isDamage ? titles.damage : titles.prephui;
-
-                if (updateUrl) {
-                    const url = new URL(window.location.href);
-                    url.hash = isDamage ? 'damage-meter' : '';
-                    window.history.pushState({ product }, '', url);
-                }
-
-                if (scroll) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }
-
-            function productFromHash() {
-                return window.location.hash.toLowerCase() === '#damage-meter'
-                    ? 'damage'
-                    : 'prephui';
-            }
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    setProduct(tab.dataset.product, {
-                        updateUrl: true,
-                        scroll: !tab.classList.contains('active')
-                    });
-                });
-            });
-
-            // Open the correct product directly from a shared URL.
-            setProduct(productFromHash(), { updateUrl: false, scroll: false });
-
-            // Browser Back / Forward.
-            window.addEventListener('popstate', () => {
-                setProduct(productFromHash(), { updateUrl: false, scroll: true });
-            });
-
-            // Manual hash changes.
-            window.addEventListener('hashchange', () => {
-                setProduct(productFromHash(), { updateUrl: false, scroll: true });
-            });
-        })();
-    </script>
-
-    <!-- Particle Engine Script -->
-    <script>
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let particlesArray = [];
-        // Increased particle density for higher prominence
-        const numberOfParticles = window.innerWidth < 768 ? 80 : 220;
-
-        function setCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                // Slightly enhanced size range
-                this.size = Math.random() * 2.5 + 0.8;
-                // Slow, floaty movement
-                this.speedX = (Math.random() * 0.6) - 0.3;
-                this.speedY = (Math.random() * -0.6) - 0.2; 
-                // Enhanced brightness and opacity range
-                this.opacity = Math.random() * 0.6 + 0.2;
-                this.pulse = Math.random() * 0.015;
-                this.pulseDirection = 1;
-            }
-            
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                
-                // Opacity pulsing
-                if (this.opacity >= 0.8) this.pulseDirection = -1;
-                if (this.opacity <= 0.2) this.pulseDirection = 1;
-                this.opacity += this.pulse * this.pulseDirection;
-
-                // Screen wrapping
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            
-            draw() {
-                ctx.fillStyle = `rgba(255, 123, 0, ${this.opacity})`;
-                ctx.shadowBlur = 14;
-                ctx.shadowColor = 'rgba(255, 123, 0, 0.9)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0; // Reset for performance
-            }
-        }
-        
-        function init() {
-            setCanvasSize();
-            particlesArray = [];
-            for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push(new Particle());
-            }
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-            }
-            requestAnimationFrame(animate);
-        }
-        
-        window.addEventListener('resize', () => {
-            setCanvasSize();
-        });
-        
-        init();
-        animate();
-    </script>
+applyTheme(state.theme);
+route();
+})();
+</script>
 </body>
 </html>
