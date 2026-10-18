@@ -43,7 +43,15 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
 
 + Unitframes
   - Make the class player preview for overlays etc not druid, then screenshot
+    - Added pet frame to be togglebale for others from the group, or a shared container also for raid
 
+### V0.2.5
+
+*Polishes*
+
++ Unitframes
+  - Added a widget overview and quick buttons to the widget tab per type
+  - Reworked overlay preview
 
 
 ### V0.2.4
