@@ -1,10 +1,33 @@
-Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub-1.5MB suite delivers everything you love about modern UI overhauls without the overhead. Featuring ultra-responsive, high-performance nameplates, hyper-optimized modules, and insane granular customization—right down to your group leader crown placement. Handcrafted for players who demand perfection and peak framerates.
+# PrephUI
+
+**Your whole UI. One window. One profile.**
+
+Unit frames, nameplates, action bars, chat, classbars, data bars and quality of life, all in a single clean settings window. Even Blizzard's own frames come along for the ride.
+
+**Built for Forever. Runs seamlessly on Retail too.**
+
+Full feature list and screenshots: **[preph.github.io/PrephUI](https://preph.github.io/PrephUI/)**
+
+![Overview](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overview.png)
 
 <!-- START DEFINITION TOC -->
 # Table of Contents
-
-- [What it offers](#what-it-offers)
+- [Why you'll love it](#why-youll-love-it)
+- [What's inside](#whats-inside)
+  - [Edit Mode](#edit-mode)
+  - [Unit Frames](#unit-frames)
+  - [Nameplates](#nameplates)
+  - [Action Bars](#action-bars)
+  - [Classbars](#classbars)
+  - [Data Bars](#data-bars)
+  - [Chat](#chat)
+  - [Skins and extras](#skins-and-extras)
+  - [Quality of Life](#quality-of-life)
+  - [Raid Tools](#raid-tools)
+- [Performance, by design](#performance-by-design)
 - [Changelog](#changelog)
+  - [V1.0.0](#v100)
+  - [V0.2.5](#v025)
   - [V0.2.4](#v024)
   - [V0.2.3](#v023)
   - [V0.2.2](#v022)
@@ -14,7 +37,7 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
   - [V0.1.15](#v0115)
   - [V0.1.14](#v0114)
   - [V0.1.13](#v0113)
-  - [V0.1.1](#v011)
+  - [V0.1.1 / V0.1.11 / V0.1.12](#v011--v0111--v0112)
   - [V0.1.0Alpha](#v010alpha)
   - [V0.0.9Alpha](#v009alpha)
   - [V0.0.8Alpha](#v008alpha)
@@ -26,14 +49,92 @@ Why sacrifice performance for a gorgeous UI? Built for peak efficiency, this sub
   - [V0.0.2Alpha](#v002alpha)
   - [V0.0.1Alpha](#v001alpha)
 <!-- END DEFINITION TOC -->
+---
 
+## Why you'll love it
+
+**One profile. Literally everything.**
+Your frames, your bars, your chat, even Blizzard's Bag Bar, Micro Menu, buffs, Cooldown Manager and Objective Tracker. Export it, import it, switch it, share it. One string, whole UI.
+
+**Fast from the first click.**
+Every module is optimized from the ground up. Event driven, no per-frame polling, and a flat cost even in a 40-player raid. It keeps updating in combat, M+ included. Nothing blanks, nothing errors.
+
+**Clean, properly.**
+One consistent look across every piece. Your UI reads as one design, not ten addons arguing.
+
+**A broad baseline, zero bloat.**
+Everything you actually need, nothing you don't. Modules load on demand, every feature has its own switch, and whatever you turn off costs nothing.
+
+---
+
+## What's inside
+
+### Edit Mode
+Move everything from one place, Blizzard's frames included. PrephUI's movers replace the native Blizzard Edit Mode ones for the Bag Bar, Micro Menu, buffs, debuffs, Cooldown Manager, Objective Tracker and more, and quietly keep Blizzard's own layout in sync behind the scenes. Positions live in your profile, so they export, import and switch with it. Anchor frames to each other and match widths and heights, so your layout lines up without the hassle.
+Too much movers? Just hide the unneeded ones, or show the ones you need.
+
+![Edit Mode](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/editmode.png)
+
+### Unit Frames
+Player, Target, ToT, Focus, Pet, Party, Raid and Main Tanks. Every frame is a health bar plus the widgets you pick: name, health text, power, castbar, icons, auras. Add, remove, anchor and style them your way. Absorb and heal overlays, native dispel highlights, and AuraWatch for defensives and externals.
+
+![Raid](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/overlays/raidframe.png)
+
+### Nameplates
+Widget based, highly optimized, and battle tested in keystones and raids. Threat and off-tank colors, quest progress, absorbs, and castbars with interrupt flash. You control the widgets, the order and the stacking.
+
+![Nameplates](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/nameplate.png)
+
+### Action Bars
+Bars 1 to 8 are nothing new, so we focused on the touch. Reshape them (square or circular), shorten keybinds, and get aura glows with no polling and cooldown numbers that work in combat. All of it sits natively on Blizzard's own action bars, and Edit Mode stays in sync.
+
+![Action Bars](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/actionbars.png)
+
+### Classbars
+Nothing magical, just done right. Highly optimized secondary resource bars for every class: combo points, holy power, runes, shards, chi, essence and more as one clean strip. It follows your spec, talents and form.
+
+### Data Bars
+As many bars as you want, highly customizable and packed with widgets: gold, FPS, latency, clock, guild, friends, durability and more, 14 in total. Anchor one to your chat and it merges with the editbox.
+
+### Chat
+A sleek panel that matches your UI. Short channel names, class colors, clickable links, a copy window, and 500 messages of history that survive reloads.
+
+![Chat](https://raw.githubusercontent.com/Preph/PrephUI/main/.github/gitmedia/ui/chat.png)
+
+### Skins and extras
+An XP bar, an M+ timer with enemy forces and deaths, a flat dark ESC menu, and item level and upgrade tracks on your gear.
+
+### Quality of Life
+Fast loot, auto repair, auto quests and gossip, flight timers and aura timer formats. Every feature has its own switch.
+
+### Raid Tools
+A raid control panel and keyword-based auto invites.
+
+---
+
+## Performance, by design
+
+- Event bursts are coalesced, so each widget updates once per pass.
+- One event registration per event, not per frame.
+- Disabled modules and removed widgets cost nothing.
+- Values are only written when they change.
+- No per-frame `OnUpdate` on unit frames. Castbar fill and cooldown numbers are native.
+- Built on Blizzard's own templates and the Secret API, so combat data flows straight into native bars, auras and text.
+- Don't take our word for it. Run the built-in profiler with `/pui perf`.
+
+[Website](https://preph.github.io/PrephUI/) · [GitHub](https://github.com/Preph/PrephUI) · [Discord](https://discord.gg/2Ey3zd4qg)
+
+By **Prephmage / Prephalia**. All rights reserved.
+
+<!-- START CHANGELOG-->
 ## Changelog
+### V1.0.0
 
-## Pending fixes
+Release candidate.
 
 ### V0.2.5
 
-*Polishes*
+*Polishes, half not listed here cause busy for release*
 
 + Unitframes
   - Added a widget overview and quick buttons to the widget tab per type
@@ -867,3 +968,4 @@ Unitframes
   - Fixed group not properly loading when joining a group
   - Added DEAD and OFFLINE indcators to group and raid frame units
   - Added ready check indicators
+<!-- END CHANGELOG-->

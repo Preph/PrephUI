@@ -256,176 +256,180 @@ const SITE = {
   footer: '&copy; Prephalia 2026',
 
   products: {
-    /* ============================ PREPHUI ============================ */
     prephui: {
       tab: 'PrephUI', icon: 'fa-solid fa-shield-halved', hash: '',
       title: 'PrephUI - Modern WoW Interface',
       hero: {
-        badges: ['Built for Midnight (12.x)', 'Secret value safe in combat'],
+        badges: ['Built on the Secret API', 'Built for Forever', 'Also supports Retail seamlessly'],
         h1: 'Enhance Without <em>Bloat</em>',
-        lead: `PrephUI is a complete World of Warcraft interface for Midnight: unit frames, nameplates, action bars, chat, class resource bars, data bars and a set of quality of life features, all set up from one settings window. It builds on Blizzard's own secure templates instead of replacing them, so it stays fast and feels like the default UI grown up. Midnight hides combat data from addons behind secret values, and PrephUI is written around that from the ground up. It never compares or calculates with a secret value, so your frames, bars, cooldowns and chat keep updating in combat, including Mythic+ and other restricted content.`,
+        lead: `Unit frames, nameplates, action bars, chat and more. One window, one profile. Built on Blizzard's own templates, and on the Secret API from the start: no compares, no math on secrets, so everything keeps updating in combat.`,
         shots: [['Overview', 'ui/overview.png'], ['Settings', 'ui/settings.png']]
       },
       about: {
         title: 'Why <em>PrephUI</em>',
         text: [
-          `The default UI already does a lot well. PrephUI lets the game's built-in systems do the heavy lifting and adds what is missing: layouts you control, better performance, and automation for the things you click through every day.`,
-          `That keeps it small. There is little to load, little to break, and nothing to relearn. Switch on only the modules you want, and the rest cost you nothing.`
+          `Blizzard's systems do the heavy lifting. PrephUI adds the control and the polish.`,
+          `Small, fast, and modular. Switch a module off and it costs nothing.`
         ],
         points: [
-          ['fa-user-shield', `<strong>Secret safe.</strong> In Midnight, health, power, auras, cooldowns and chat text can arrive as secret values in combat. PrephUI passes them straight to native bars, aura containers and text, and never branches on them, so nothing goes blank or throws errors mid-fight.`],
-          ['fa-bolt', `Native secure templates and the game's modern built-in systems do the work, so it stays fast in a 40-player raid.`],
-          ['fa-check', `Very few external libraries, so there is less to load and less to break.`],
-          ['fa-puzzle-piece', `Every module loads on demand and is switched on from one settings window. Open it with <code>/pui</code>.`],
-          ['fa-file-export', `Everything is stored in your profile, so it exports, imports and switches as one.`]
+          ['fa-user-shield', `<strong>Secret safe.</strong> Combat data flows straight into native bars, auras and text. Nothing blanks, nothing errors.`],
+          ['fa-bolt', `Native templates keep it light, even in a 40-player raid.`],
+          ['fa-check', `Almost no external libraries.`],
+          ['fa-puzzle-piece', `Every module loads on demand. Open the settings with <code>/pui</code>.`],
+          ['fa-file-export', `One profile. Export, import, switch.`]
         ],
         shot: 'ui/editmode.png'
       },
 
       categories: [
         { id: 'unitframes', icon: 'fa-users', title: 'Unit Frames',
-          tag: `Player, target, party and raid frames made from widgets you pick.`,
-          intro: `Frames for Player, Target, Target of Target, Focus, Pet, Party, Raid (all 8 subgroups) and Main Tanks (up to four rows: tank, their target, their target's target). Each frame type keeps its own ordered widget list. Name, health text, power, castbar, icons and auras are all widgets that you add, remove, anchor and style yourself. The defaults are only a starting point, and anything you remove stays removed. In the settings window every widget has its own page, with drag and drop ordering plus Add, Copy, Remove and Reset.`,
+          tag: `A frame is a health bar plus the widgets you pick.`,
+          intro: `Player, Target, ToT, Focus, Pet, Party, Raid and Main Tanks. Name, health text, power, castbar, icons and auras are all widgets that you add, remove, anchor and style your way. The defaults are only a starting point, and anything you remove stays removed.`,
           features: [
-            ['fa-puzzle-piece', 'Widgets', `Anchor a widget to the frame, the health bar or another widget, then nudge it into place. Text widgets can be added more than once, so you can have two names or three health texts.`],
-            ['fa-heart', 'Health bar and color', `Class, reaction or custom color. Horizontal or vertical fill, reverse fill and a custom texture. Offline, ghost and dead states recolor the bar. You also get a hover highlight, a target border and a threat border with adjustable color and thickness, and an optional frame border and background.`],
-            ['fa-droplet', 'Overlays on the bar', `Absorb shields (an overshield wraps back into the bar), incoming heals, heals that will be eaten, and max health reduction, where the bar rescales to your real maximum. Each one can be toggled and colored per frame type, and the overlay textures can be swapped globally.`],
-            ['fa-hand-sparkles', 'Dispel highlights', `A native highlight colored per type: Magic, Curse, Disease, Poison, Enrage and Bleed. Show every type, or only the dispels you know.`],
-            ['fa-eye', 'AuraWatch', `Track defensives, active mitigation, raid cooldowns, externals, healing buffs and more on each frame. Pick a corner per category and add your own spells. An aura you mark as important is highlighted when it is missing.`],
-            ['fa-people-group', 'Group and raid', `Sort by role, choose the grow direction, spacing and units per column. The range fader uses your own in-range and out-of-range alpha, set per frame type. Blizzard's party and raid frames are hidden for you.`],
-            ['fa-up-down-left-right', 'Edit Mode', `Every frame has an Edit Mode mover. The Target frame can mirror the Player frame's geometry, and detached power bars and castbars have their own movers.`]
+            ['fa-puzzle-piece', 'Widgets', `Anchor to the frame, the health bar or another widget, then nudge it into place. Text widgets can be added more than once, so two names or three health texts are fine.`],
+            ['fa-heart', 'Health bar', `Class, reaction or custom color. Any fill direction, custom texture, and offline, ghost and dead states that recolor the bar. Hover, target and threat borders on top.`],
+            ['fa-droplet', 'Overlays', `Absorbs with overshield wrapping back into the bar, incoming heals, heal absorb and max health reduction. Toggle and color each one per frame type.`],
+            ['fa-hand-sparkles', 'Dispel highlights', `A native highlight colored per type: Magic, Curse, Disease, Poison, Enrage and Bleed. Show all of them, or only what you can dispel.`],
+            ['fa-eye', 'AuraWatch', `Defensives, externals, raid cooldowns, healing buffs and more, one corner per category. Add your own spells. An important aura lights up when it's <em>missing</em>.`],
+            ['fa-people-group', 'Group and raid', `Sort by role, set growth, spacing and units per column. Range fader with your own in-range and out-of-range alpha. Blizzard's party and raid frames are hidden for you.`],
+            ['fa-shield-halved', 'Safe in combat', `Secret values flow straight into native bars, auras and text. Nothing blanks, nothing errors.`],
+            ['fa-up-down-left-right', 'Edit Mode', `Every frame has a mover, and so do detached power bars and castbars. The Target frame can mirror the Player frame.`]
           ],
           perf: [
-            `Event bursts are coalesced. However many <code>UNIT_HEALTH</code> events land in a window, each widget updates at most once per pass, up to 10 passes a second.`,
-            `Each event is registered once for the whole addon, not once per frame, and only while a widget needs it. Forty raid frames do not mean forty callbacks.`,
-            `Widgets you remove register no events and run no code. Overlays you turn off cost nothing. Alpha, text and icon state are only rewritten when the value changed.`,
-            `No unit frame uses a per-frame <code>OnUpdate</code>. The few timers are shared and switch themselves off when there is nothing to do, and castbar fill is driven natively by the client.`,
-            `Hot paths allocate nothing, so you do not get garbage collection hitches in the middle of a pull. Every update runs isolated, so one bad or suddenly forbidden frame cannot break the rest.`
+            `Event bursts are coalesced. However many health events land, each widget updates once per pass, 10 passes a second at most.`,
+            `One event registration per event for the whole addon, not per frame. Forty raid frames don't mean forty callbacks.`,
+            `Removed widgets and disabled overlays register nothing and run nothing. Values are written only when they change.`,
+            `No per-frame <code>OnUpdate</code>. The few shared timers switch themselves off when idle, and castbar fill is native.`,
+            `Hot paths allocate nothing, so no GC hitches mid-pull. One bad frame can't break the queue.`,
+            `Don't take our word for it: <code>/pui perf uf 30</code> ranks cost per widget, event and component.`
           ],
           tables: [{ title: 'All widgets', head: ['Widget', 'What it does'], rows: [
-            ['Name', `Class, reaction or custom color, max width, realm names and [Dead] and [Offline] tags`],
-            ['Health text', `Up to four values from Current, Max, Percent, Deficit, Absorb, Heal absorb and Incoming, with your own separator and K/M/B abbreviation`],
-            ['Power', `Docked, floating or fully detached. Shows the mana cost of your current cast`],
-            ['Castbar', `Cast, channel and empower. Attached or detached, with channel ticks and a latency safe zone`],
-            ['Buffs / Debuffs', `Native aura containers with size, spacing, growth direction and row wrapping`],
-            ['Portrait', `2D, 3D or class icon, docked left or right`],
+            ['Name', `Class, reaction or custom color, max width, realm names, [Dead] and [Offline] tags`],
+            ['Health text', `Up to four values from Current, Max, Percent, Deficit, Absorb, Heal absorb, Incoming`],
+            ['Power', `Docked, floating or detached. Shows mana cost of your cast`],
+            ['Castbar', `Cast, channel, empower. Ticks and latency safe zone`],
+            ['Buffs / Debuffs', `Native containers with size, spacing, growth, wrapping`],
+            ['Portrait', `2D, 3D or class icon`],
             ['Level', `Difficulty colors, optional hide at max level`],
-            ['Role', `Tank, healer or damager icon`],
+            ['Role', `Tank, healer, damager`],
             ['Raid marker', `Raid target markers`],
             ['Leader / Assist', `Crown and assist icons`],
-            ['Assignment', `Main Tank, Main Assist and Master Looter`],
-            ['Resurrection / Summon', `Incoming resurrection and summon status icons`],
+            ['Assignment', `Main Tank, Main Assist, Master Looter`],
+            ['Resurrection / Summon', `Incoming res and summon`],
             ['Ready check', `Ready check status`],
-            ['Combat / Resting', `In combat and resting status icons`],
-            ['PvP', `PvP flag icon with a flag timer`],
+            ['Combat / Resting', `Combat and resting status`],
+            ['PvP', `PvP flag with timer`],
             ['Pet happiness', `Where the client supports it`]
           ] }],
           shots: [['ui/overlays/raidframe.png', 'Raid'], ['ui/overlays/groupframe.png', 'Group'], ['ui/overlays/alloverlays.png', 'All overlays'], ['ui/overlays/aurawatch.png', 'Aurawatch in Group'], ['ui/overlays/dispells.png', 'Dispel'], ['ui/overlays/absorb.png', 'Absorb'], ['ui/overlays/healabsorb.png', 'Heal absorb'], ['ui/overlays/maxhealthreduce.png', 'Max health reduction']] },
 
         { id: 'nameplates', icon: 'fa-id-badge', title: 'Nameplates',
-          tag: `Threat colors, quest progress, aura rows and a castbar, laid out your way.`,
-          intro: `Blizzard's plate is hidden and replaced. The plate keeps one ordered widget list with name, level, buffs and debuffs, raid marker, threat, quest objectives and a power bar. Add or delete widgets, anchor them to the health bar, the castbar or another widget, and nudge them into place. You can add several of the same type, for example one aura row for your debuffs and another for crowd control. The Level and Quest widgets switch themselves off in Mythic+ keystones to save space and CPU.`,
+          tag: `A plate is a health bar plus the widgets you pick.`,
+          intro: `Blizzard's plate is hidden and replaced by one ordered widget list: name, level, auras, raid marker, threat, quest objectives and a power bar. Anchor anything to the health bar, the castbar or another widget, and add several of the same type, like one aura row for debuffs and another for crowd control. Battle tested in keystones and raids.`,
           features: [
-            ['fa-heart', 'Health bar and color', `Reaction colors, optional class colors for players, a hover highlight and pixel-perfect borders that do not flicker as plates move. Health text is built from tokens: <code>[curhp]</code>, <code>[maxhp]</code>, <code>[curhp%]</code>, <code>[curpp]</code>, <code>[maxpp]</code>, <code>[curpp%]</code>, <code>[name]</code> and <code>[level]</code>. Large numbers are shortened (<code>4k</code>, <code>4 Mil</code>), including secret values.`],
-            ['fa-bullseye', 'Threat, target and focus', `High, medium and low threat colors are applied before anything else. The plate changes color when the mob is on another tank (assigned role or Main Tank), classified mobs get a lieutenant tint, and tap-denied mobs are greyed out unless you have threat on them. Target glow comes in several styles, and focus plates get their own color and an optional overlay texture.`],
-            ['fa-list-check', 'Quest objectives', `Shows <code>!</code> and your progress (<code>3/8</code>) on mobs you need for a quest. The value is read from the unit tooltip. When the tooltip is restricted in combat, the last known value is used. Friendly quest givers are not tracked.`],
-            ['fa-shield', 'Absorbs', `Shields on NPC plates are drawn as a striped bar from the end of the health bar, so overshields stay visible.`],
-            ['fa-wand-sparkles', 'Castbar', `Spell icon and name, the cast target (class-colored for players), an interrupt flash with adjustable timing, and your own colors and height.`],
-            ['fa-layer-group', 'Stacking and size', `Set how much plates overlap horizontally and vertically. Blizzard's distance scaling and fade are turned off, so your fixed plate size is not fought.`],
+            ['fa-heart', 'Health bar', `Reaction colors, optional class colors for players, hover highlight and pixel-perfect borders that don't flicker. Health text from tokens like <code>[curhp]</code>, <code>[curhp%]</code> and <code>[name]</code>, with big numbers shortened, secrets included.`],
+            ['fa-bullseye', 'Threat, target, focus', `High, medium and low threat colors, an off-tank color for mobs on another tank, a lieutenant tint, tap-denied grey, target glow in several styles, and a focus color with its own overlay.`],
+            ['fa-list-check', 'Quest objectives', `<code>!</code> and your progress (<code>3/8</code>) on the mobs you need. When the tooltip is restricted in combat, the last known value is used.`],
+            ['fa-shield', 'Absorbs', `Shields on NPC plates are a striped bar from the end of the health bar, so overshields stay visible.`],
+            ['fa-wand-sparkles', 'Castbar', `Spell icon and name, cast target (class colored for players), an interrupt flash with adjustable timing, and your own colors and height.`],
+            ['fa-layer-group', 'Stacking', `Set horizontal and vertical overlap. Blizzard's distance scaling and fade are turned off, so your size sticks.`],
+            ['fa-circle-info', 'Friendly NPC plates', `Hidden by default, because Blizzard doesn't let addons restyle them in instances. Set <code>hideFriendlyNPCPlates = false</code> to keep them.`]
           ],
           perf: [
-            `Event driven. Plates are pooled and reused instead of rebuilt.`,
-            `Frames are only created when a plate needs them, and updates skip native calls when nothing changed.`,
-            `Level and Quest widgets switch off in Mythic+ keystones, where space and CPU matter most.`,
-            `Aura rows are native containers, so addon code never reads the auras.`
+            `Plates are pooled and reused. Frames are only created when a plate needs them.`,
+            `Updates skip native calls when nothing changed.`,
+            `Aura rows are native containers, so addon code never reads auras.`,
+            `Level and Quest widgets switch themselves off in Mythic+ keystones to save space and CPU.`,
+            `Measure it yourself: <code>/prephnp prof [seconds]</code>.`
           ],
           tables: [{ title: 'All widgets', head: ['Widget', 'What it does'], rows: [
-            ['Name', `Alignment follows the anchor you pick`],
-            ['Level', `Small boxed level badge`],
-            ['Buffs / Debuffs', `Native aura containers with limit, size, spacing and growth direction. Filter by your own, crowd control, dispellable or purgeable, and exclude spell IDs`],
+            ['Name', `Alignment follows the anchor`],
+            ['Level', `Small boxed badge`],
+            ['Buffs / Debuffs', `Limit, size, spacing, growth. Filter by own, CC, dispellable, purgeable. Exclude spell IDs`],
             ['Raid marker', `Any size, any anchor`],
-            ['Threat', `Threat as a percentage to pull aggro, or the raw value, colored by threat state`],
-            ['Quest objectives', `Shows ! and your progress on mobs you need for a quest`],
+            ['Threat', `Percent to pull aggro or raw value`],
+            ['Quest objectives', `! and progress`],
             ['Power bar', `Optional resource bar`]
           ] }],
           shots: [['ui/nameplate.png', 'Quest progress and health text on a plate']] },
 
         { id: 'actionbars', icon: 'fa-table-cells', title: 'Action Bars',
-          tag: `Eight bars, a stance bar and a pet bar on a grid you control.`,
-          intro: `Your eight action bars, the stance bar and the pet bar are rebuilt on a clean grid. Each bar is its own block: turn it on or off, choose how many buttons it has and how many fit in a row, pick which way it grows, then anchor it to the screen or to another bar. The defaults give you two wide bars at the bottom, two side blocks and a stance bar, and you can change all of them. Disabled bars stay hidden and cost nothing.`,
+          tag: `Your bars are yours. Blizzard's layout follows.`,
+          intro: `Bars 1 to 8, the stance bar and the pet bar, rebuilt on a clean grid. Set size, rows, spacing and style per bar, then anchor it to the screen or to another bar. It all sits natively on Blizzard's own action bars, and Edit Mode stays in sync behind the scenes. Disabled bars cost nothing.`,
           features: [
-            ['fa-arrows-up-down-left-right', 'Any shape', `Grow right, left, up or down, so a bar can be a row, a column or a block. A bar anchored to another bar follows it, so moving Bar 1 moves everything built around it.`],
-            ['fa-circle', 'Button style', `Square or circular buttons with your own size, spacing and buttons per row. Icon zoom is shared by every bar. Add an optional border (size and color per bar, class color supported) and an optional empty slot grid. Keybind and macro text sizes are adjustable, and you can hide macro names.`],
-            ['fa-keyboard', 'Short keybinds', `Modifiers and keys are shortened (<code>s-</code>, <code>a-</code>, <code>c-</code>, <code>M3</code>, <code>MWU</code>, <code>NP1</code> and so on), in English and German. Keybinds on empty buttons are hidden unless the grid is on.`],
-            ['fa-stopwatch', 'Cooldowns', `Icons desaturate while a real cooldown is running, per bar. The global cooldown never greys anything out, and anything left desaturated after a fight is cleaned up when you leave combat. Cooldown numbers use Blizzard's native countdown, so they work in combat. Pick <code>1:30</code>, abbreviated or flat truncated minutes, plus your own font and size.`],
-            ['fa-wand-magic-sparkles', 'Aura glows', `Pick a spell and the slot lights up when that aura is on you, with a looping pulse and no polling. Add as many spells to a slot as you like and change the glow style in one place. Blizzard's aura containers draw the glow, so addon code never reads the aura and it keeps working in restricted content.`],
-            ['fa-eye-slash', 'Blizzard art and Edit Mode', `You can hide the default main bar art, the status tracking bars, the micro button bar and other Blizzard bar chrome. Every bar has an Edit Mode mover and a right-click quick panel. Position, rows, icon count, icon size and padding are pushed into Blizzard's own Edit Mode layout, so your bars and the native ones agree on where things are. Native icon size moves in 10% steps, so the native bar is rounded down and always fits inside yours. 45 px counts as 100% native size on every bar.`],
-            ['fa-lock', 'In combat, vehicles and pet battles', `Layout changes can't be applied in combat. They are queued and applied when you leave it. Bars hide themselves in pet battles, in vehicles and while an override bar is up.`]
+            ['fa-arrows-up-down-left-right', 'Any shape', `Grow right, left, up or down, so a bar can be a row, a column or a block. A bar anchored to another bar follows it.`],
+            ['fa-circle', 'Button style', `Square or circular. Size, spacing, buttons per row, icon zoom, optional borders with class color, an empty slot grid and your own text sizes.`],
+            ['fa-keyboard', 'Short keybinds', `<code>s-</code> <code>a-</code> <code>c-</code> <code>M3</code> <code>MWU</code> <code>NP1</code>, in English and German. Keybinds on empty buttons stay hidden unless the grid is on.`],
+            ['fa-stopwatch', 'Cooldowns', `Icons desaturate on a real cooldown and never on the global one. Numbers use Blizzard's native countdown, so they work in combat. Pick a 1:30, abbreviated or flat minutes format.`],
+            ['fa-wand-magic-sparkles', 'Aura glows', `Pick a spell and the slot lights up while that aura is on you, with a looping pulse and no polling. Blizzard's containers draw it, so it keeps working in restricted content.`],
+            ['fa-eye-slash', 'Blizzard art and Edit Mode', `Hide the default bar art, status bars and micro button chrome if you like. Position, rows and icon size are pushed into Blizzard's layout, so both agree. 45 px counts as 100% native size.`],
+            ['fa-lock', 'Combat and vehicles', `Layout changes queue in combat and apply the moment you leave it. Bars hide in pet battles, vehicles and while an override bar is up.`]
           ],
           perf: [
-            `Event driven, with no per-frame polling. Events only touch the buttons they could affect, not all 150 of them.`,
-            `Cooldowns are handled by one central pass instead of a handler per button.`,
+            `No per-frame polling. Events touch only the buttons they could affect, not all 150.`,
+            `One central cooldown pass instead of a handler per button.`,
             `Button styling is cached with a signature, so an identical restyle is skipped.`,
-            `Stance and pet layouts only rebuild when something changed. In combat the work waits until you leave it.`
+            `Stance and pet layouts only rebuild when something actually changed.`,
+            `Measure it yourself: <code>/run PrephUIActionbarsProf(10)</code>.`
           ],
           tables: [{ title: 'Bars', head: ['Bar', 'What it is'], rows: [
-            ['Action Bars 1 to 8', `The main bar, both bottom bars, both right bars and Bars 6 to 8. Up to 12 buttons each`],
-            ['Stance bar', `Sizes itself to the forms you actually have, so it never shows empty buttons`],
-            ['Pet bar', `Ten buttons, anchored to your pet frame by default`]
+            ['Action Bars 1 to 8', `Up to 12 buttons each`],
+            ['Stance bar', `Sizes to your forms, no empty buttons`],
+            ['Pet bar', `Ten buttons, anchored to the pet frame`]
           ] }],
           shots: [['ui/actionbars.png', 'Three bars with keybinds, timers and glows'], ['ui/proccs.png', 'Proc overlays']] },
 
         { id: 'classbars', icon: 'fa-layer-group', title: 'Classbars',
-          tag: `Combo points, holy power, runes, shards and more as one strip of segments.`,
-          intro: `Combo points, holy power, runes, soul shards, chi, essence, arcane charges, insanity and maelstrom are drawn as evenly spaced segments on a single bar. Each class has a small definition file that lists its resources. The bar reads it, hides what your spec does not use, and follows spec, talent and form changes on its own. Switch spec or shift into cat form and the bar updates. If your class has nothing to show right now, the bar hides itself. Classbars are for secondary resources. Mana, rage, energy and other primary power belong on your player frame, so they are left out.`,
+          tag: `Nothing magical. Just done right.`,
+          intro: `Your class resource as one clean strip you can read at a glance. Combo points, holy power, runes, shards, chi, essence, arcane charges, insanity and maelstrom are drawn as evenly spaced segments. The bar follows your spec, talents and form, shows only what you use, and hides itself when there's nothing to show. Mana, rage and other primary power belong on your player frame.`,
           features: [
-            ['fa-palette', 'Look', `Set width, height and spacing, fill opacity and background opacity. Use class color or your own color for each resource, and choose per resource whether it shows a number. Every segment can have a border with its own thickness and color (class color supported). The border is drawn in front of the fill, so a full segment never hides its edge. Runes that are still recharging use their own dim opacity.`],
-            ['fa-anchor', 'Layout', `By default the bar sits on top of your player castbar. Anchor it to any frame you like, or drag it with its Edit Mode mover. Classes that have more than one resource at once stack them in rows, with the same spacing as the segments.`],
-            ['fa-bolt', 'Buff driven resources', `Some resources are really buffs, like Maelstrom Weapon on clients where it is a five stack. In restricted content the bar hands those to Blizzard's native aura containers, so the segments keep filling in combat without addon code reading the aura. On clients where Maelstrom Weapon is a spell, the Shaman bar only shows once you know it.`],
-            ['fa-code', 'Easy to extend', `A class file only lists the resources, their segment count and an optional color. <code>/pui dump talents</code> prints your learned talents with their spell IDs, which is handy when you write one.`]
+            ['fa-palette', 'Look', `Width, height, spacing and opacity. Class color or your own color per resource, optional numbers, and a border on every segment drawn in front of the fill, so a full segment never hides its edge.`],
+            ['fa-anchor', 'Layout', `Sits on your player castbar by default. Anchor it to any frame or just drag it. Classes with more than one resource stack them in rows.`],
+            ['fa-bolt', 'Buff driven resources', `Resources that are really buffs, like Maelstrom Weapon, use Blizzard's aura containers in restricted content. The segments keep filling in combat without addon code reading the aura.`],
+            ['fa-code', 'Easy to extend', `A class file only lists resources, segment count and an optional color. <code>/pui dump talents</code> lists your talents with spell IDs.`]
           ],
           perf: [
-            `Event driven. Power events only wake the bar when the power type is one it shows.`,
-            `Updates are batched into one pass per frame.`,
-            `Layout and values are separate, so an event that only changes a number never rebuilds the segments.`,
-            `Class definitions refresh on spec, talent and form changes, not on every power tick.`,
-            `Nothing is registered for resources your class does not have. Aura scanning is off on retail and only runs for buff based resources on clients that need it.`
+            `Power events only wake the bar when the power type is one it shows.`,
+            `Updates are batched into one pass per frame. A number change never rebuilds the segments.`,
+            `Definitions refresh on spec, talent and form changes, not on every power tick.`,
+            `Nothing is registered for resources your class doesn't have.`
           ],
           tables: [{ title: 'What each class shows', head: ['Class', 'Resource'], rows: [
-            ['Death Knight', `Runes, with recharging runes dimmed`],
+            ['Death Knight', `Runes, recharging ones dimmed`],
             ['Druid', `Combo points in cat form`],
             ['Evoker', `Essence`],
             ['Mage', `Arcane charges`],
             ['Monk', `Chi`],
             ['Paladin', `Holy power`],
-            ['Priest', `Insanity for Shadow`],
+            ['Priest', `Insanity (Shadow)`],
             ['Rogue', `Combo points`],
-            ['Shaman', `Maelstrom for Elemental and Enhancement, including the buff driven Maelstrom Weapon on WoW Forever`],
+            ['Shaman', `Maelstrom, incl. Maelstrom Weapon on WoW Forever`],
             ['Warlock', `Soul shards`],
-            ['Demon Hunter, Hunter, Warrior', `Nothing. Fury, Pain, Focus and Rage are primary power`]
+            ['Demon Hunter, Hunter, Warrior', `Nothing. Primary power only`]
           ] }],
           shots: [['ui/classbar.png', 'Classbar Overview']] },
 
         { id: 'chat', icon: 'fa-message', title: 'Chat',
-          tag: `A cleaner chat panel with short channel names, class colors and saved history.`,
-          intro: `Blizzard's chat chrome is replaced with a clean panel, a slim button gutter and a matching editbox. The chat window, the gutter and the editbox row are one block. You move and resize that block in Edit Mode (its mover is called Chat Window), and the position and size are written into Blizzard's own layout too, so the two never fight over where the chat lives. The window accepts 250 to 800 wide and 120 to 800 tall.`,
+          tag: `Looks like your UI. Stays out of the way.`,
+          intro: `Blizzard's chat chrome is stripped and replaced with a clean panel, a slim button gutter and a matching editbox. The whole block moves and resizes as one (<strong>Chat Window</strong> in Edit Mode), and the size and position are written into Blizzard's layout too, so the two never fight over where the chat lives.`,
           features: [
-            ['fa-palette', 'Look', `Background color, opacity and an on / off toggle. A border with thickness and color (class color supported), shared with the rest of PrephUI. Tabs follow the panel, and the selected tab is the bright one. Pick your chat font and size from your shared media fonts. Blizzard's textures, edge art and scrollbar are hidden. With Apply to Blizzard on in the general font settings, your font also reaches Blizzard panels, including the Guild & Communities chat.`],
-            ['fa-keyboard', 'Editbox', `Put it below or above the chat. If one of your Data Bars is anchored to the chat, the editbox slides into that bar's row, and the chat, the bar and the editbox share one exact width with no gap. When the editbox closes, the bar comes back. While you type, the editbox is raised above the bar with a fully opaque background so nothing bleeds through.`],
-            ['fa-table-columns', 'Button gutter', `A column on the left of the chat with Copy, Friends, Up, Down, Bottom, Channel and Emote buttons. Blizzard's own arrows are gone and the channel and emote menus are restyled to match. The mouse wheel scrolls the chat too, and Shift jumps to the top or bottom. Voice, text to speech and Quick Join buttons are hidden.`],
-            ['fa-hashtag', 'Short channel names', `<code>[1. General]</code> becomes <code>[1]</code>, so more of the actual message fits on a line. Guild, Officer, Party, Raid, Raid Warning and Instance become one or two letters, and so do says, yells and whispers. Joined, Left and Changed Channel notices keep the full name.`],
-            ['fa-user-tag', 'Class colored names', `Names in a message are colored by class when they are in your group, raid or guild. Click one to whisper them. Emotes are left alone.`],
-            ['fa-link', 'Clickable links', `Web addresses become links. Click one and it lands in your editbox, selected and ready to copy.`],
-            ['fa-clock', 'Timestamps', `<code>HH:MM</code>, <code>HH:MM:SS</code> or <code>MM:SS</code> in a quiet grey. They use Blizzard's own timestamp setting, so turning them off here turns them off everywhere.`],
-            ['fa-inbox', 'Whispers tab', `Optionally move every whisper, Battle.net included, into its own Whispers tab. Turning it on sets whispers to open inline and creates a Whispers window if you do not have one.`],
-            ['fa-clock-rotate-left', 'History', `The last 500 messages of your main chat are saved and put back after a reload, a relog or a zone change, in order and only once, even if Blizzard rebuilds your chat windows several times in a row. History belongs to the account, not the character, and only the main chat window is saved.`],
-            ['fa-copy', 'Copy chat', `Opens a window with your recent chat, with colors and one timestamp kept. Links and icons are cleaned out, so what you copy is plain, readable text. Drag it anywhere, and Esc closes it.`]
+            ['fa-palette', 'Look', `Background, border and font that match the rest of PrephUI. Tabs follow the panel, with the selected one bright. Blizzard's textures, edge art and scrollbar are gone.`],
+            ['fa-keyboard', 'Editbox', `Below or above the chat. Anchor a Data Bar to the chat and the editbox slides into its row, with one exact width, no gap and no wasted screen space.`],
+            ['fa-table-columns', 'Button gutter', `Copy, Friends, Up, Down, Bottom, Channel and Emote in a tidy column. The mouse wheel scrolls, and Shift jumps to the top or bottom.`],
+            ['fa-hashtag', 'Short channels', `<code>[1. General]</code> becomes <code>[1]</code>. Guild, Party, Raid and the rest shrink to one or two letters.`],
+            ['fa-user-tag', 'Class colors', `Names of group, raid and guild members are class colored. Click one to whisper them.`],
+            ['fa-link', 'Links', `Web addresses are clickable. Click one and it lands in your editbox, selected and ready to copy.`],
+            ['fa-clock', 'Timestamps', `<code>HH:MM</code>, <code>HH:MM:SS</code> or <code>MM:SS</code>, in a quiet grey.`],
+            ['fa-inbox', 'Whispers tab', `Optional. Every whisper, Battle.net included, in its own tab.`],
+            ['fa-clock-rotate-left', 'History', `The last 500 messages survive a reload, a relog and a zone change. They come back in order, and only once.`],
+            ['fa-copy', 'Copy chat', `Your recent chat in a window you can select from. Colors and timestamps kept, links and icons cleaned out, one timestamp only.`]
           ],
           perf: [
-            `Event driven. Group and guild colors refresh on roster events, and the guild scan runs at most once a minute.`,
-            `Messages that do not need touching pass through after a few cheap checks instead of a pile of pattern scans.`,
-            `Secret values are never read, changed or saved. Chat text is only colored, shortened or linked when it is safe to, and anything the client marks as secret is shown exactly as it arrived.`,
-            `Channel shortening is skipped in Mythic+ keystones, where chat text is often secret.`
+            `Event driven. Group and guild colors refresh on roster events, and the guild scan runs once a minute at most.`,
+            `Messages that need no change pass after a few cheap checks instead of a pile of pattern scans.`,
+            `Secret values are never read, changed or saved. They show exactly as they arrived.`,
+            `Channel shortening is skipped in Mythic+ keystones, where chat text is often secret.`,
+            `Measure it yourself: <code>/pui perf chat [seconds]</code>.`
           ],
           tables: [{ title: 'Short channel names', head: ['Channel', 'Shown as'], rows: [
             ['General and numbered channels', `<code>[1]</code>`],
@@ -437,84 +441,81 @@ const SITE = {
           shots: [['ui/chat.png', 'Chat panel with button gutter']] },
 
         { id: 'databars', icon: 'fa-chart-bar', title: 'Data Bars',
-          tag: `Gold, FPS, latency, clock, guild and more in bars you place yourself.`,
-          intro: `Add as many bars as you like, put any of the 14 modules on them and give each bar its own settings page. The modules are System, Clock, Zone, Layer, Durability, Guild, Friends, Talents, Reload, Bags, Gold, FPS, Latency and PrephsUI. Hover a module to get a tooltip with more detail. A bar can also be anchored to your chat, where the editbox merges into its row.`,
+          tag: `Gold, FPS, latency, clock, guild and more.`,
+          intro: `As many bars as you want, highly customizable and packed with widgets. 14 modules to fill them, a settings page for every bar, and details on hover. Anchor one to your chat and it merges with the editbox.`,
           features: [
-            ['fa-plug', 'Mix and match', `Put any modules on any number of bars and style each bar on its own page.`],
-            ['fa-computer-mouse', 'Detail on hover', `Most modules have a tooltip, from raid resets to addon CPU time. The module table lists what each one shows.`],
-            ['fa-link', 'Next to your chat', `Anchor a bar to your chat and the two share one exact width with the editbox.`]
+            ['fa-plug', 'Mix and match', `Put any module on any bar and style each bar its own way. Add and remove bars as you need them.`],
+            ['fa-link', 'Next to chat', `Anchor a bar to the chat and the editbox slides into its row. When the editbox closes, the bar is back.`]
           ],
           perf: [
-            `Each module updates on its own events instead of one shared polling loop.`,
-            `The FPS tooltip shows a live addon memory and CPU breakdown, so you can see what costs what.`
+            `Each module updates on its own events. There is no shared polling loop.`,
+            `The FPS tooltip shows live addon memory and CPU, so you can see what costs what.`
           ],
           tables: [{ title: 'All modules', head: ['Module', 'What it shows'], rows: [
-            ['System', `Quick access for everyday utility and a system overview`],
-            ['Clock', `Hover for account-wide raid IDs plus weekly and 3-day reset countdowns`],
-            ['Zone', `Your current zone`],
-            ['Layer', `The layer you are on, worked out from NPC GUIDs`],
-            ['Durability', `Hover for the exact condition and percentage of every equipped slot`],
-            ['Guild', `Hover for levels, names and AFK/DND tags. Hold <code>Shift</code> for zones, notes and officer notes`],
-            ['Friends', `Character level, Battle.net / RealID status and friends on your server`],
-            ['Talents', `Quick access to your talents`],
-            ['Reload', `One click UI reload`],
-            ['Bags', `Bag space at a glance`],
-            ['Gold', `Total gold across the whole account, with a breakdown by faction and character`],
-            ['FPS', `Hover for a live breakdown of addon memory usage and CPU time`],
-            ['Latency', `Home and world latency`],
-            ['PrephsUI', `UI resets, profile management and a status overview`]
+            ['System', `Utility shortcuts and a system overview`],
+            ['Clock', `Raid IDs, weekly and 3-day reset timers`],
+            ['Zone', `Current zone`],
+            ['Layer', `Current layer, from NPC GUIDs`],
+            ['Durability', `Condition per equipped slot`],
+            ['Guild', `Levels, names, AFK/DND. <code>Shift</code> adds zones and notes`],
+            ['Friends', `Battle.net / RealID and server friends`],
+            ['Talents', `Quick access to talents`],
+            ['Reload', `One click reload`],
+            ['Bags', `Free bag space`],
+            ['Gold', `Account-wide, by faction and character`],
+            ['FPS', `Live addon memory and CPU`],
+            ['Latency', `Home and world`],
+            ['PrephsUI', `Resets, profiles, status`]
           ] }],
           shots: [['ui/databar.png', 'Databar with guild, FPS, zone, clock, gold and more']] },
 
         { id: 'skins', icon: 'fa-window-restore', title: 'Skins & Edit Mode',
-          tag: `Move Blizzard's own frames from PrephUI and keep them in your profile.`,
-          intro: `Blizzard's frames keep their position in an Edit Mode layout that is easy to lose and hard to share. Skins turns the Bag Bar, Micro Menu, buffs, debuffs, Cooldown Manager, Objective Tracker and the rest into part of your PrephUI profile, with a PrephUI mover that replaces the native one. Position and size are stored in the profile, so they export, import and switch with it. They are pushed into the active native layout when you log in or change profile, and pulled back when you save in Blizzard's Edit Mode. Right-click any mover for a quick panel with the same options Edit Mode would show, plus a few extras and arrow buttons to nudge it. Every part can be switched off on its own, and a part that does not exist on your client is skipped.`,
+          tag: `Blizzard's frames, moved from PrephUI.`,
+          intro: `Blizzard's Edit Mode layout is easy to lose and hard to share. Skins turns the Bag Bar, Micro Menu, buffs, debuffs, Cooldown Manager, Objective Tracker and more into part of your profile, with a PrephUI mover and a right-click quick panel for each. Position and size export, import and switch with the profile, and stay in sync with the native layout both ways.`,
           features: [
-            ['fa-up-down-left-right', 'Movers for empty frames', `Frames that are empty most of the time, like the Cooldown Manager, debuffs, totems or the vehicle button, keep a mover you can actually grab. The mover takes its size from Blizzard's native box and follows orientation, wrap, icon size and padding when you change them.`],
-            ['fa-sort', 'Aura frames', `Buffs and debuffs keep Blizzard's layout and you place them with a mover. Sort them by remaining time, shortest or longest first, or turn sorting off, in which case nothing is hooked and nothing runs. Auras with secret durations cannot be compared in combat, so they keep Blizzard's own order. The cooldown text format (Blizzard default, <code>1:05</code>, <code>1m5s</code>, <code>2m</code>) is offered when Quality of Life is enabled.`],
-            ['fa-bars-progress', 'Experience bar', `A slim bar you place yourself, replacing Blizzard's status tracking bar. Purple is your current XP, yellow is XP from quests you can already hand in, and light blue is rested XP. Hover for remaining XP, rested XP, total quest log XP, XP this session, XP per hour and estimated time to level. It is hidden at max level, and shown again while movers are unlocked so you can still place it. Width, height and offset are in its right-click panel. Switching it off brings Blizzard's bar back.`],
-            ['fa-hourglass-half', 'M+ timer', `Replaces Blizzard's keystone block with a compact frame. It shows the keystone level, dungeon name and affix icons (with affix tooltips), time spent and time left, and a timer bar with +3 and +2 marks that changes color as you fall behind. Enemy forces are a bar with percent and count. Deaths have a tooltip with who died, when and the killing blow, taken from the death recap when the client provides it. The final result stays up after the run. A preview shows while movers are unlocked, and it is not loaded on clients without Mythic+.`],
-            ['fa-shirt', 'Gear and quest rewards', `Item level on equipment in your character panel and bags, for weapons, armor and profession gear. An upgrade track sits next to each equipped item, colored by track: Explorer, Adventurer, Veteran, Champion, Hero and Myth. The character panel shows your average item level with two decimals. A gold coin marks the quest reward with the highest vendor price. Each of the three can be switched off on its own.`],
-            ['fa-moon', 'ESC menu', `A flat, dark game menu with matching buttons and hover states instead of Blizzard's stone frame. One switch turns it off.`],
-            ['fa-circle-info', 'Good to know', `Skins move and configure frames. Most of them do not change how Blizzard draws them yet. Values you change in Blizzard's Edit Mode are only picked up after you save or leave it. Loss of Control is a native Edit Mode system from 12.1.0 on, and older clients skip it quietly. Swing Timer and the multicast Totem Bar are for the WoW Forever client. Other clients use the plain totem frame, which has no Edit Mode system, so it is anchored directly. If the M+ enemy forces ever look wrong, <code>/mplusdebug</code> prints the raw scenario criteria.`]
+            ['fa-up-down-left-right', 'Movers you can grab', `Frames that are empty most of the time, like the Cooldown Manager, debuffs or totems, keep a mover you can actually grab. Its size follows the native box.`],
+            ['fa-sort', 'Aura frames', `Sort buffs and debuffs by remaining time, shortest or longest first, or keep Blizzard's order. Off means nothing is hooked and nothing runs. Secret durations keep Blizzard's order in combat.`],
+            ['fa-bars-progress', 'Experience bar', `A slim bar you place yourself. Purple for current XP, yellow for quests you can hand in, light blue for rested. Hover for XP per hour and time to level.`],
+            ['fa-hourglass-half', 'M+ timer', `A compact keystone frame with affix icons, a timer bar with +3 and +2 marks, enemy forces, and deaths with a recap tooltip. The result stays up after the run.`],
+            ['fa-shirt', 'Gear', `Item level and upgrade track on your gear, colored by track from Explorer to Myth. Two decimals on your average, and a gold coin on the best quest reward.`],
+            ['fa-moon', 'ESC menu', `A flat, dark game menu with matching buttons, instead of Blizzard's stone frame. One switch turns it off.`],
+            ['fa-circle-info', 'Good to know', `Skins move and configure frames, they mostly don't restyle them. Edit Mode changes are picked up when you save. Loss of Control needs 12.1.0. Swing Timer and the multicast Totem Bar are for WoW Forever.`]
           ],
           perf: [
             `Event driven. Bags refresh after <code>BAG_UPDATE_DELAYED</code>, never inside Blizzard's own refresh.`,
             `Upgrade tracks are cached per slot and cleared when that slot changes.`,
             `Aura sorting reuses its tables, allocates nothing and skips the work when the order is already right.`,
-            `Native layout writes only happen when something actually changed. Parts that do not exist on your client register nothing.`
+            `Native layout writes only happen when something actually changed. Parts missing on your client register nothing.`
           ],
           tables: [{ title: 'Moved frames', head: ['Frame', 'Quick panel'], rows: [
-            ['Bag Bar', `Orientation, direction, size, and a real show / hide toggle, which Blizzard does not offer`],
+            ['Bag Bar', `Orientation, direction, size, and a real show / hide`],
             ['Micro Menu', `Orientation, order, menu size, eye size`],
-            ['Buffs', `Orientation, icon wrap, direction, limit, size, padding, sorting`],
-            ['Debuffs', `The same, plus show dispel type`],
-            ['Cooldown Manager', `One mover each for Essential, Utility, Tracked Buffs and Tracked Bars`],
+            ['Buffs', `Orientation, wrap, direction, limit, size, padding, sorting`],
+            ['Debuffs', `Same, plus dispel type`],
+            ['Cooldown Manager', `One mover each: Essential, Utility, Tracked Buffs, Tracked Bars`],
             ['Objective Tracker', `Height (400 to 1000), text size, opacity`],
-            ['Loss of Control', `Size, with a live preview of icon, ability name and timer inside the mover`],
+            ['Loss of Control', `Size, with live preview`],
             ['Vehicle Exit, Totem Bar', `Position only`],
-            ['Swing Timer', `One mover each for main hand, off hand and ranged, on the client that has them`]
+            ['Swing Timer', `Main hand, off hand, ranged`]
           ] }],
           shots: [['ui/editmode.png', 'Edit Mode with PrephUI movers']] },
 
         { id: 'qol', icon: 'fa-hand-pointer', title: 'Quality of Life',
-          tag: `Auto loot, repair, quests and gossip, flight timers and aura timer formats.`,
-          intro: `Small conveniences for the things you click through a hundred times a day: loot, repairs, quests, gossip menus, aura timers, flight times and a few camera and nameplate settings. Nothing here changes how your UI looks, it only saves you clicks. Every feature is its own switch and every switch is on by default, so turn off what you do not want. A feature that needs an event only registers for it while it is on.`,
+          tag: `The little things you stop clicking.`,
+          intro: `Loot, repairs, quests, gossip, aura timers, flight times and a few camera and nameplate settings. Every feature is its own switch, and every switch is on by default. Nothing here changes how your UI looks. It only saves you clicks.`,
           features: [
-            ['fa-sack-dollar', 'Loot and vendors', `Fast loot takes every item from a corpse or chest the moment the loot window opens, and follows your auto loot setting and auto loot modifier key. Disable loot warnings confirms the pop-ups for bind on pickup, loot rolls, selling an item that still has a trade timer, and locking items in the mail. Auto repair repairs everything when you open a vendor, from your own gold, and tells you what it cost. If you cannot afford it, it tells you that instead.`],
-            ['fa-scroll', 'Quests and gossip', `Auto-accept takes available quests and continues quests that are ready to progress. Auto turn in hands in finished quests when there is nothing to choose. Auto gossip skips through menus for vendors, banks and flight masters, and takes a lone ride or flight option when no quest is offered. Quests with more than one reward choice are never turned in for you, so the pick stays yours.`],
-            ['fa-hand', 'Hold a key to stop it', `Pick Shift, Alt, Ctrl or none. Holding that key while you talk to an NPC turns quest and gossip automation off for that conversation. Shift is the default.`],
-            ['fa-hourglass', 'Aura timers', `Choose a timer format for buffs and debuffs. It only swaps the timer text. An aura whose time is hidden by combat restrictions keeps Blizzard's text, and going back to Blizzard default hands every button back.`],
-            ['fa-feather', 'Flight timers', `Hover a destination on the flight map and the tooltip gets a Flight time line. A <code>~</code> in front means the time is estimated from the route flown the other way. While you fly, a countdown bar shows the destination name. Move it from Unlock UI, where it shows a sample bar. It survives a <code>/reload</code> or relog mid-flight and clears itself when you land. The Frequent Flier speed bonus is included automatically when you know the talent.`],
-            ['fa-camera', 'View', `Camera max zoom factor sets how far you can zoom out, and nameplate max distance sets how far away nameplates are drawn. Both are applied on login and whenever you change profile. They are set through CVars, so another addon that sets them can overwrite them until your next login or profile change.`],
-            ['fa-circle-info', 'Good to know', `Disable loot warnings confirms prompts that are there to protect you, like selling an item with a trade timer. Switch it off if you want them back. Flight times come from the game's own route data and a base flight speed, so they are a close estimate, not a stopwatch, and routes missing from the data show no time. <code>/prephflight</code> explains why a flight time is or is not shown. Run it with a flight map open after hovering a destination.`]
+            ['fa-sack-dollar', 'Loot and vendors', `Fast loot takes everything the moment the window opens. Auto repair uses your own gold and tells you what it cost. Optional auto-confirm for bind on pickup, rolls and trade timer prompts.`],
+            ['fa-scroll', 'Quests and gossip', `Accept, continue and turn in. Quests with a reward choice are never turned in for you, so the pick is yours. Gossip skips through vendors, banks and flight masters.`],
+            ['fa-hand', 'Override key', `Hold Shift, Alt or Ctrl while you talk to an NPC and the automation pauses for that conversation. Shift is the default.`],
+            ['fa-hourglass', 'Aura timers', `Choose <code>1:30</code>, <code>1m30s</code> or a single rounded unit like <code>2m</code>. Only the timer text changes, and a hidden time keeps Blizzard's text.`],
+            ['fa-feather', 'Flight timers', `A flight time line in the map tooltip and a countdown bar while you fly. It survives a reload mid-flight. Close estimates from the game's own route data, not a stopwatch.`],
+            ['fa-camera', 'View', `Camera max zoom and nameplate max distance, applied on login and on profile change. Set through CVars, so other addons can overwrite them.`]
           ],
           perf: [
-            `Event driven. Fast loot, repair, quests and gossip only act on their own events, and only register while switched on.`,
-            `Aura timers use one ticker at 10 times per second instead of hooking Blizzard's per-frame duration update. Text is only rewritten when the displayed second changes, and common strings are cached.`,
-            `The ticker starts when you choose a format and stops when you go back to Blizzard default.`,
-            `Aura events are filtered to your player and vehicle, not your whole raid.`,
-            `Flight events are only registered while a flight option is on. The tooltip hook is installed the first time you open a flight map.`
+            `Event driven. Every feature acts on its own events and registers them only while it's switched on.`,
+            `Aura timers use one 10 Hz ticker instead of Blizzard's per-frame hook. Text is only rewritten when the displayed second changes.`,
+            `Aura events are filtered to you and your vehicle, not your whole raid.`,
+            `The flight tooltip hook is installed the first time you open a flight map.`
           ],
           tables: [{ title: 'Aura timer formats', head: ['Format', 'Looks like'], rows: [
             ['Blizzard default', `Untouched`],
@@ -525,81 +526,80 @@ const SITE = {
           shots: [] },
 
         { id: 'raidtools', icon: 'fa-chess-board', title: 'Raid Tools & Auto Invites',
-          tag: `A raid control panel and an auto inviter driven by chat keywords.`,
-          intro: `A raid control panel for setting up and running your group, plus an auto inviter that builds the group from keywords people type in chat. Both are in the settings window under Utilities.`,
+          tag: `Run the raid. Fill the raid.`,
+          intro: `A raid control panel and keyword based auto invites, both under Utilities.`,
           features: [
-            ['fa-robot', 'Auto invites', `Invites players who type your keyword in chat, optionally including guild chat. A new keyword can be temporary: set how long it lasts in minutes, or enter 0 to keep it permanently.`],
-            ['fa-people-roof', 'Guild whitelist', `Only invite from the guilds you whitelist. Your own guild is always treated as whitelisted, and you can add others. You can also accept invites from guildmates.`],
-            ['fa-check-double', 'Raid control', `A panel for ready checks, pulls and other raid utility, so you do not have to dig through Blizzard's menus.`]
+            ['fa-robot', 'Auto invites', `Invites whoever types your keyword. Keywords can expire after a set number of minutes.`],
+            ['fa-people-roof', 'Guild whitelist', `Invite only from the guilds you allow. Yours always counts.`],
+            ['fa-check-double', 'Raid control', `Ready checks, pulls and raid utility in one panel.`]
           ],
-          perf: [`Auto invites only react to chat events while enabled, so an option you do not use costs nothing.`],
+          perf: [
+            `Auto invites listen to chat only while they're enabled.`
+          ],
           shots: [['ui/autoinvite.png', 'Auto Invites settings'], ['ui/raidcontrol.png', 'Raid control panel']] }
       ],
-      cta: { title: 'Get PrephUI', text: `Free, and the source is on GitHub. Bug reports and suggestions are welcome there or on Discord.`,
+      cta: { title: 'Get PrephUI', text: `Free and open source. Bugs and ideas on GitHub or Discord.`,
         links: [['fa-brands fa-github', 'GitHub', 'https://github.com/Preph/PrephUI'], ['fa-solid fa-puzzle-piece', 'CurseForge', 'https://www.curseforge.com/wow/addons/prephui']] }
     },
 
-    /* ========================= DAMAGE METER ========================= */
     damage: {
       tab: 'Damage Meter', icon: 'fa-solid fa-chart-simple', hash: 'damage-meter',
       title: `Preph's Damage Meter - PrephUI`,
       hero: {
-        badges: ['Retail 12.1 compatible', 'WoW Forever compatible'],
+        badges: ['Built on the Secret API', 'WoW Forever compatible'],
         h1: `Preph's <em>Damage Meter</em>`,
-        lead: `A damage meter that reads Blizzard's built-in combat data, so it stays light and keeps working in combat. You get up to five windows, ten meter types, a death recap on every death row, and fights that survive a reload.`,
+        lead: `A meter that reads Blizzard's own combat data. Light and accurate. Five windows, ten meter types, death recap, and fights that survive a reload.`,
         shots: [['Modern Style', 'dmg/overview.png'], ['WoW Forever Style', 'dmg/overview-forever.png']]
       },
       categories: [
         { id: 'tracks', icon: 'fa-chart-line', title: 'What it tracks',
-          tag: `Ten meter types, one per window.`, intro: `Every window shows one meter type. Change it from the window title or with a right-click.`,
+          tag: `Ten meter types, one per window.`, intro: `Each window shows one meter type. Switch from the title or with right-click.`,
           features: [
-            ['fa-chart-line', 'Output', `Damage Done, Healing Done and Absorbs, with per-second values. Your own bar stays pinned when you scroll.`],
-            ['fa-shield-halved', 'Intake', `Damage Taken, Avoidable Damage Taken and Enemy Damage Taken.`],
-            ['fa-hand-fist', 'Utility', `Interrupts, Dispels, Deaths and Threat. Threat is live only and follows your target, focus or boss units.`]
+            ['fa-chart-line', 'Output', `Damage, Healing and Absorbs, with per-second values. Your own bar stays pinned.`],
+            ['fa-shield-halved', 'Intake', `Damage Taken, Avoidable Damage Taken, Enemy Damage Taken.`],
+            ['fa-hand-fist', 'Utility', `Interrupts, Dispels, Deaths and live Threat.`]
           ], shots: [] },
         { id: 'breakdown', icon: 'fa-computer-mouse', title: 'Hover for the breakdown',
-          tag: `Abilities and targets behind every number.`, intro: `Hover a bar to see what is behind the number. Blizzard hides some values in combat, so ranks and full target lists fill in a few seconds after the fight.`,
+          tag: `The abilities and targets behind every number.`, intro: `Hover a bar for the breakdown. Blizzard hides some values in combat, so ranks and full target lists fill in seconds after the fight.`,
           features: [
-            ['fa-bolt', 'Damage and healing', `The abilities used, plus the targets hit or healed.`],
-            ['fa-burst', 'Damage taken', `Which abilities hurt, and which mobs or players dealt the damage.`],
-            ['fa-ban', 'Interrupts, dispels, absorbs', `Which abilities were stopped or removed, and who got shielded.`]
+            ['fa-bolt', 'Damage and healing', `Abilities used, targets hit or healed.`],
+            ['fa-burst', 'Damage taken', `Which abilities hurt, and who dealt it.`],
+            ['fa-ban', 'Interrupts, dispels, absorbs', `What was stopped or removed, and who got shielded.`]
           ], shots: [['dmg/dmgrecap.png', 'Damage breakdown tooltip']] },
         { id: 'deaths', icon: 'fa-skull', title: 'Death recap',
-          tag: `The last hits before a player died.`, intro: `Hover a row in the Deaths meter to see the last hits before that player died, oldest first. The killing blow is highlighted.`,
+          tag: `The last hits before a player died.`, intro: `Hover a row in the Deaths meter. Last hits before death, oldest first, killing blow highlighted.`,
           features: [
-            ['fa-list', 'Each hit', `Ability, source, amount and seconds before death, with a health bar per hit.`],
-            ['fa-heart-pulse', 'Healing and absorbs', `Overkill and absorbed damage are shown on the hit they belong to. Received healing is inferred from health changes.`],
-            ['fa-paw', 'Feign Death filter', `Optionally hides Hunters who are feigning death from the list.`]
+            ['fa-list', 'Each hit', `Ability, source, amount, time before death, health bar per hit.`],
+            ['fa-heart-pulse', 'Healing and absorbs', `Overkill and absorbs on the hit they belong to. Healing is inferred from health changes.`],
+            ['fa-paw', 'Feign Death filter', `Optionally hide Hunters feigning death.`]
           ], shots: [['dmg/deathrecap.png', 'Death recap tooltip']] },
         { id: 'looks', icon: 'fa-wand-magic-sparkles', title: 'Two looks',
-          tag: `Modern or WoW Forever, applied to every window.`,
-          intro: `One checkbox switches every window between two looks. <strong>Modern</strong> is flat bars on a dark window. <strong>WoW Forever</strong> uses a bronze frame edge, a dark brown title bar, the classic bar texture and outlined text. Bar texture and font are set separately through LibSharedMedia.`,
+          tag: `Modern or WoW Forever.`,
+          intro: `One checkbox. <strong>Modern</strong> is flat bars on a dark window. <strong>WoW Forever</strong> is bronze edge, brown title bar, classic texture. Texture and font come from LibSharedMedia.`,
           features: [], shots: [['dmg/overview.png', 'Modern'], ['dmg/overview-forever.png', 'WoW Forever']] },
         { id: 'windows', icon: 'fa-window-restore', title: 'Windows and fights',
-          tag: `Up to five windows, each with its own fight.`, intro: `Open up to five windows and give each one its own meter type and fight.`,
+          tag: `Up to five windows, each with its own fight.`, intro: `Each window gets its own meter type and fight.`,
           features: [
-            ['fa-magnet', 'Snapping', `Drag a window next to another to anchor it. It keeps its own size or matches its neighbour.`],
-            ['fa-clock-rotate-left', 'Past fights', `Pick Current, Overall or one of up to 25 recent fights. The last 5 survive a <code>/reload</code> and show up under Saved.`],
-            ['fa-key', 'Mythic+', `Data can reset when a key starts, so Overall covers exactly that key.`],
-            ['fa-link', 'Sync', `Pick a fight in one window and every window follows.`]
+            ['fa-magnet', 'Snapping', `Drag next to another window to anchor it.`],
+            ['fa-clock-rotate-left', 'Past fights', `Current, Overall or one of 25 recent fights. The last 5 survive <code>/reload</code>.`],
+            ['fa-key', 'Mythic+', `Optional reset on key start, so Overall covers exactly that key.`],
+            ['fa-link', 'Sync', `Pick a fight in one window and all follow.`]
           ], shots: [] },
         { id: 'dmsettings', icon: 'fa-gear', title: 'Settings and commands',
-          tag: `Open the settings with /pdm config.`, intro: `Sliders for windows, bar height, spacing, font size, opacity, scale and combat refresh rate, and toggles for class icons, the pinned bar and locking. It works standalone, or becomes movable in PrephUI Edit Mode.`,
+          tag: `/pdm config opens the settings.`, intro: `Windows, bar height, spacing, font, opacity, scale, refresh rate. Works standalone or inside PrephUI Edit Mode.`,
           features: [],
           tables: [{ title: 'Slash commands', head: ['Command', 'What it does'], rows: [
-            ['/pdm', `Show or hide the meter`], ['/pdm config', `Open settings`], ['/pdm windows 3', `Set the number of windows (1-5)`],
+            ['/pdm', `Show or hide the meter`], ['/pdm config', `Open settings`], ['/pdm windows 3', `Set window count (1-5)`],
             ['/pdm lock, unlock', `Lock or unlock position and size`], ['/pdm layout', `Reset window positions`], ['/pdm reset', `Clear all data (asks first)`]
           ] }],
           shots: [['dmg/settings.png', 'Damage Meter settings']] }
       ],
-      cta: { title: 'Get it', text: `Free, and the source is on GitHub. Bug reports and suggestions are welcome there or on Discord.`,
+      cta: { title: 'Get it', text: `Free and open source. Bugs and ideas on GitHub or Discord.`,
         links: [['fa-brands fa-github', 'GitHub', 'https://github.com/preph/PrephDamageMeter'], ['fa-solid fa-puzzle-piece', 'CurseForge', 'https://www.curseforge.com/wow/addons/prephdamagemeter']] }
     }
   }
 };
 
-/* Sidebar layout per product: [ [ 'Group name', [ category ids... ] ], ... ]
-   'home' is the overview page. Categories that are not listed end up in a "More" group. */
 const NAV = {
   prephui: [
     ['General',   ['home']],
