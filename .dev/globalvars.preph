@@ -15,9 +15,9 @@
             "readme": "README.md",
             "changelog": "PrephUI\\PrephUISettings\\General\\Changelog.lua",
             "version": {
-                "major": 0,
-                "minor": 2,
-                "patch": 4
+                "major": 1,
+                "minor": 0,
+                "patch": 0
             },
             "alsoBundleThese": [
                 "PrephUI/PrephUIActionbars", 

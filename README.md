@@ -126,11 +126,39 @@ A raid control panel and keyword-based auto invites.
 
 By **Prephmage / Prephalia**. All rights reserved.
 
++ Editmode
+  - When anchoring the parent frame doesnt rescale back
+
++ Chat
+  - Multiple Chatframe movers if multiple chats exist
+
++ API
+  - Allow other addons to inject themself as movers, but attribute cost to them
+
++ Reload Settings
+  - When reloading, the accent color isnt properly applied that is set into the settings menu
+
 <!-- START CHANGELOG-->
 ## Changelog
 ### V1.0.0
 
-Release candidate.
+*Performance patch, release candidate* 
+
++ Performance
+  - Performance
+  - Performance
+  - Even more Performance
+  - And even more....
+
++ Nameplates
+  - proper uninterruptible castbar color workaround
+  - Showing interrupters name
+
++ Unitframes 
+  - Fixed a bug where maxhealthreduction was able to show in and after death and revive
+
++ Databars
+  - Added LibDataBroker elements
 
 ### V0.2.5
 
